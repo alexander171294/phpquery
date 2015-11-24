@@ -1,5 +1,8 @@
 <?php
 
+define('eTPL1', 'eTPL1::1 don\'t exists view ');
+define('eTPL2', 'eTPL2::2 you can\'t name a variable with void string');
+
 class template
 {
     protected $includes = array();
@@ -8,11 +11,13 @@ class template
     
     public function show($file)
     {
-        $this->includes[] = array('source' => tplData::$folder.$file.tplData::$extension, 'filename' => $file);
+        if(!file_exists(tplData::$folder.$file.tplData::$extension)) _error_::set(eTPL1.$file.tplData::$extension, LVL_FATAL);
+        else $this->includes[] = array('source' => tplData::$folder.$file.tplData::$extension, 'filename' => $file);
     }
     
     public function assign($var, $content)
     {
+        if(empty($var)) _error_::set(eTPL2, LVL_FATAL);
         $this->values[$var] = $content;
     }
     
@@ -148,15 +153,15 @@ class template
 
 function EliminaParametroURL($url, $parametro)
 {
-list($urlpart, $qspart) = array_pad(explode('?', $url), 2, '');
-
-parse_str($qspart, $qsvars);
-
-unset($qsvars[$parametro]);
-
-$nuevoqs = http_build_query($qsvars);
-
-return $urlpart . '?' . $nuevoqs;
+    list($urlpart, $qspart) = array_pad(explode('?', $url), 2, '');
+    
+    parse_str($qspart, $qsvars);
+    
+    unset($qsvars[$parametro]);
+    
+    $nuevoqs = http_build_query($qsvars);
+    
+    return $urlpart . '?' . $nuevoqs;
 } 
 
 return new template();
