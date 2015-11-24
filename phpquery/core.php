@@ -1,5 +1,7 @@
 <?php
 
+_::set_time();
+
 require('class.date.php');
 require('class.inputvars.php');
 
@@ -36,6 +38,10 @@ class _
     static protected $footers = array();
     static protected $extras = array();
     static protected $loaded = array();
+    
+    // statics of use
+    static protected $time = array();
+    static protected $memory = array();
     
     static public function init($debug = true)
     {
@@ -100,15 +106,25 @@ class _
         } else _error_::set(E6.' components/thirdparty/'.$name.'.php', LVL_FATAL);
     }
     
-    static public function define_autocall($function)
+    static public function define_autocall($function, $calculate_costs = false)
     {
+        if($calculate_costs) {
+            self::set_time('autocall');
+        }
         if(is_callable($function))
+        {
             $function();
+            if($calculate_costs)
+                echo 'COST OF AUTOCALL: '.self::get_cost('autocall');
+        }
         else _error_::set(E7, LVL_FATAL);
     }
     
-    static public function define_controller($action, $function)
+    static public function define_controller($action, $function, $calculate_costs = false)
     {
+        if($calculate_costs) {
+            self::set_time('controller_'.$action);
+        }
         self::$actions[$action] = $function;
     }
     
@@ -130,6 +146,9 @@ class _
                     if(is_callable($call))
                     {
                         $call();
+                        // si exigimos calcular los costos
+                        if(self::saved_costs('controller_'.$action))
+                            echo 'COST OF CONTROLLER '.$action.': '.self::get_cost('controller_'.$action);
                         self::exec_footers();
                     } else _error_::set(E4.' '.htmlentities($action), LVL_FATAL);
                 } else _error_::set(E3.' '.htmlentities($action), LVL_FATAL);
@@ -280,6 +299,27 @@ class _
             self::declare_component('searcher');
     }
     
+    static public function set_time($index = 'coreMain')
+    {
+        self::$time[$index] =  microtime(true);
+        self::$memory[$index] = memory_get_usage();
+    }
+    
+    static public function get_cost($index = 'coreMain')
+    {
+        return number_format(microtime(true) - self::$time[$index], 4).' seconds of execution; '.self::formatbytes(memory_get_usage() - self::$memory[$index]).' used in memory';
+    }
+    
+    static public function saved_costs($index = 'coreMain')
+    {
+        return isset(self::$time[$index]);
+    }
+    
+    static private function formatbytes($size)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
 }
 
 spl_autoload_register(function($class){

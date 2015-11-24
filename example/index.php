@@ -46,3 +46,6 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'home';
 _::execute($action);
 // to end, show all views seted using _::$view->show();
 _::$view->execute();
+
+// SHOW TIME COST
+var_dump(_::get_cost());
