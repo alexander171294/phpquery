@@ -1,9 +1,9 @@
 <?php
 
 // ORM for php, designed for PDO and phpquery
-define('eORM1', '<b>ORM ERROR</b> eORM1::1 el modelo no cuenta con los campos correspondientes a la tabla [orm#53]');
-define('eORM2', '<b>ORM ERROR</b> eORM2::2 clave primaria no definida en modelo [orm#24]');
-define('eORM3', '<b>ORM ERROR</b> eORM3::3 claves primarias no coinciden en instanciacion [orm#30]');
+define('eORM1', 'eORM1::1 the fields on the model not match with fields in table ');
+define('eORM2', 'eORM2::2 primary key isn\'t defined in the model ');
+define('eORM3', 'eORM3::3 primary keys don\'t match in instantiation of table ');
 
 abstract class table
 {
@@ -22,13 +22,13 @@ abstract class table
     
     public function __construct($ids = null)
     {
-        if(empty($this->primaryKeys)) die(eORM2);
+        if(empty($this->primaryKeys)) _error_::set(eORM2.self::tablename(), LVL_FATAL);
         $this->describe();
         if(!empty($ids))
         {
             if(is_array($this->primaryKeys))
             {
-                if(count($this->primaryKeys) !== count($ids)) die(eORM3);
+                if(count($this->primaryKeys) !== count($ids))  _error_::set(eORM3.self::tablename(), LVL_FATAL);
                 $out = array();
                 for($i = 0; $i<count($this->primaryKeys); $i++)
                 {
@@ -52,7 +52,7 @@ abstract class table
         {
             if(!property_exists($this, $field))
             {
-                die(eORM1);
+                _error_::set(eORM1.' field:'.$field.' table:'.self::tablename(), LVL_WARNING);
             }
         }
     }

@@ -30,7 +30,17 @@ Why? you test, evaluate, and improve each function in your script to get the bes
 
 [!!!] WE RECOMMEND YOU CHANGE ALL DEPRECATED FUNCTIONS IF IT CAN, WE DELETE IN THE FUTURE ALL DEPRECATED FUNCTIONS FOR REDUCE RESOURCE COST!
 
+
+-- Control Resource Consumption:
+This idea proposes add parameter to define_controller function, allowing dump the consumption of the controller, for debug reasons
+
+-- New error system:
+Using a config template (with DB config, and TPL config) set you functions for error control.
+
+
 OTHERS CHANGES:
 
 * fix bug in ORM
+* fix bug in view class
+* improve performance in views
 * Control resource consumption don't show if debug mode is off
