@@ -4,6 +4,9 @@
 2º improve load_requires function. (improve speed)
 * now, isn't load always the components, now loads by demand
 
+3º improve error system. (make easy debug the code)
+* now, the errors system equipped with a bugtrace, errors levels, and is possible you set custom error function to catch errors.
+
 5º split examples.
 * now, the examples are commented and splitted
 
