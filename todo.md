@@ -4,7 +4,9 @@
 5º add documentation, and split examples.
 6º delete functions.php, this file is not necessary
 7º Check backward compatibility with older version of the framework.
-
+8º improve _date to support initial value and add clear format.
+9º debug view class.
+10º replace attach_* for define_autocall
 -- Control Resource Consumption:
 This idea proposes add parameter to define_controller function, allowing dump the consumption of the controller, for debug reasons
 

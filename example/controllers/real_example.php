@@ -179,8 +179,3 @@ _::define_controller('registro2', function(){ // todo: codigo promocional; selec
                         _::$view->show('registro');
                 }
         });
-
-_::define_controller('recordar_pass', function(){
-                define('EXTERA_PAGE', true);
-                _::$view->show('recordar');
-        });
