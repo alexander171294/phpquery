@@ -267,3 +267,7 @@ class _
         $function();
     }
 }
+
+spl_autoload_register(function($class){
+            _::declare_model($class);
+        });
