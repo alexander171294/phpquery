@@ -31,7 +31,6 @@ class _
     static protected $files = null;
     static protected $controllers = array();
     static protected $actions = null;
-    static protected $headers = array();
     static protected $footers = array();
     static protected $extras = array();
     static protected $loaded = array();
@@ -109,7 +108,6 @@ class _
                     $call = self::$actions[$action];
                     if(is_callable($call))
                     {
-                        self::exec_headers();
                         $call();
                         self::exec_footers();
                     } else die(E4.' '.htmlentities($action));
@@ -118,19 +116,13 @@ class _
         } else die(E1.' '.htmlentities($action));
     }
     
-    static private function exec_headers()
-    {
-        foreach(self::$headers as $header)
-        {
-            $header();
-        }
-    }
-    
+    // alias of autocall, for backward compatibility reasons.
     static public function attach_header($function)
     {
-        self::$headers[] = $function;
+        self::define_autocall($function);
     }
     
+    // this is really interesting, i like delete this, but change my opinion.
     static private function exec_footers()
     {
         foreach(self::$footers as $footer)
