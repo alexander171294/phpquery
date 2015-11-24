@@ -1,6 +1,7 @@
 <?php
 
-// this function is deprecated since version 1.0.1, changed by _::define_autocall();
+// this function is execute after controllers.
+// this DON'T EXECUTE IF YOU CALL REDIRECT IN CONTROLLER
 _::attach_footer(function(){
         _::$view->show('footer');
     });
