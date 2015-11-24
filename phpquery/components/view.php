@@ -31,6 +31,10 @@ class template
             $forceReWork = true;
         if(DEVMODE)
             $forceReWork = true;
+            
+        // crear index
+        if(!file_exists(tplData::$cacheDir.'headers.var') or $forceReWork)
+            $this->reWorkIndex();
         
         foreach($this->includes as $include)
         {
@@ -53,20 +57,26 @@ class template
         file_put_contents(tplData::$cacheDir.$fileData['filename'].'.tmp', $source);
     }
     
+    public function reWorkIndex()
+    {
+        $out = '<?php '.PHP_EOL;
+        foreach($this->values as $variable => $value)
+        {
+            $out .= '$'.$variable.' = $_[\''.$variable.'\'];'.PHP_EOL;
+        }
+        file_put_contents(tplData::$cacheDir.'headers.var', $out);
+    }
+    
     public function replaceEntities($source)
     {
-        // parse inner vars
-        $regex = '/\{if=\"(.*)\$([a-zA-Z0-9_]*)(\-\>\[\')*([^\}]*)(.*)\"\}/';
-        $regex2 = '{if="$1\$_[\'$2\']$3$4$5"}';
-        $source = preg_replace($regex, $regex2, $source);
-        
+
         //bucles
         $regex = '/\{loop=\$([a-zA-Z0-9_]*)(\-\>\[\')*(.*)\ as \$([a-zA-Z0-9_]*) to \$([a-zA-Z0-9_]*)}/';
-        $regex2 = '<?php foreach(\$_[\'$1\']$2$3 as \$_[\'$4\'] => \$_[\'$5\']){ ?>';
+        $regex2 = '<?php foreach(\$$1$2$3 as \$$4 => \$$5){ ?>';
         $source = preg_replace($regex, $regex2, $source);
         
         $regex = '/\{loop=\$([a-zA-Z0-9_]*)(\-\>\[\')*(.*)\ as \$([a-zA-Z0-9_]*)}/';
-        $regex2 = '<?php foreach(\$_[\'$1\']$2$3 as \$_[\'$4\']){ ?>';
+        $regex2 = '<?php foreach(\$$1$2$3 as \$$4){ ?>';
         $source = preg_replace($regex, $regex2, $source);
         
         //if
@@ -91,13 +101,13 @@ class template
         $source = preg_replace($regex, $regex2, $source);
         
         // var dump
-        $regex = '/\{dump=\$([a-zA-Z0-9_]*)(\-\>\[\')*([^\}]*)\}/';
-        $regex2 = '<?=var_dump(\$_[\'$1\']$2$3);?>';
+        $regex = '/\{dump=([^\)]*)\}/';
+        $regex2 = '<?=var_dump($1);?>';
         $source = preg_replace($regex, $regex2, $source);
         
         // primero procesamos las variables
-        $regex = '/\{\$([a-zA-Z0-9_]*)(\-\>\[\')*([^\}]*)\}/';
-        $regex2 = '<?=\$_[\'$1\']$2$3;?>';
+        $regex = '/\{\$([^\}]*)\}/';
+        $regex2 = '<?=\$$1;?>';
         $source = preg_replace($regex, $regex2, $source);
         
         // ahora las constantes
@@ -127,6 +137,7 @@ class template
     public function loadCache()
     {
         $_ = $this->values;
+        include(tplData::$cacheDir.'headers.var');
         foreach($this->includes as $include)
         {
             include(tplData::$cacheDir.$include['filename'].'.tmp');
