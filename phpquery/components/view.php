@@ -55,6 +55,10 @@ class template
     
     public function replaceEntities($source)
     {
+        // parse inner vars
+        $regex = '/\{if=\"(.*)\$([a-zA-Z0-9_]*)(\-\>\[\')*([^\}]*)(.*)\"\}/';
+        $regex2 = '{if="$1\$_[\'$2\']$3$4$5"}';
+        $source = preg_replace($regex, $regex2, $source);
         
         //bucles
         $regex = '/\{loop=\$([a-zA-Z0-9_]*)(\-\>\[\')*(.*)\ as \$([a-zA-Z0-9_]*) to \$([a-zA-Z0-9_]*)}/';
@@ -66,8 +70,13 @@ class template
         $source = preg_replace($regex, $regex2, $source);
         
         //if
-        $regex = '/\{if=\"(.*)\"\}/';
+        $regex = '/\{if=\"([^\"]*)\"\}/';
         $regex2 = '<?php if($1){ ?>';
+        $source = preg_replace($regex, $regex2, $source);
+        
+        //function
+        $regex = '/\{function=\"([^\"]*)\"\}/';
+        $regex2 = '<?=$1;?>';
         $source = preg_replace($regex, $regex2, $source);
         
         // cierres
@@ -96,7 +105,8 @@ class template
         $regex2 = '<?=$1;?>';
         $source = preg_replace($regex, $regex2, $source);
         
-        $source = str_replace('{url}','http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $source);
+        $source = str_replace('{url}','http://'.$_SERVER['HTTP_HOST'], $source);
+        $source = str_replace('{url:full}','http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $source);
         
         // ESTO VA EN PREG_MATCH_ALL //
         // ahora la url
