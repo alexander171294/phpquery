@@ -103,7 +103,7 @@ abstract class table
             foreach($this->fields as $field)
             {
                 $changes .= $field.' = ?, ';
-                $values[] = $field;
+                $values[] = $this->$field;
             }
             $changes = trim($changes, ', ');
             $values = array_merge($values, $this->iwc_values);

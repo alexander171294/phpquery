@@ -24,3 +24,7 @@ Why? you test, evaluate, and improve each function in your script to get the bes
 [!] we recommend you change attach header for define_autocall if it can. Why? we delete in the future this function for reduce resource cost.
 
 [!!!] WE RECOMMEND YOU CHANGE ALL DEPRECATED FUNCTIONS IF IT CAN, WE DELETE IN THE FUTURE ALL DEPRECATED FUNCTIONS FOR REDUCE RESOURCE COST!
+
+OTHERS CHANGES:
+
+* fix bug in ORM
