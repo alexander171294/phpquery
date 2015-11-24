@@ -42,9 +42,11 @@ class _
     // statics of use
     static protected $time = array();
     static protected $memory = array();
+    static protected $debug = false;
     
     static public function init($debug = true)
     {
+        self::$debug = $debug;
         if($debug)
         {
             ini_set('display_errors', true);
@@ -108,13 +110,13 @@ class _
     
     static public function define_autocall($function, $calculate_costs = false)
     {
-        if($calculate_costs) {
+        if($calculate_costs && self::$debug) {
             self::set_time('autocall');
         }
         if(is_callable($function))
         {
             $function();
-            if($calculate_costs)
+            if($calculate_costs && self::$debug)
                 echo 'COST OF AUTOCALL: '.self::get_cost('autocall');
         }
         else _error_::set(E7, LVL_FATAL);
@@ -122,7 +124,7 @@ class _
     
     static public function define_controller($action, $function, $calculate_costs = false)
     {
-        if($calculate_costs) {
+        if($calculate_costs && self::$debug) {
             self::set_time('controller_'.$action);
         }
         self::$actions[$action] = $function;
@@ -147,7 +149,7 @@ class _
                     {
                         $call();
                         // si exigimos calcular los costos
-                        if(self::saved_costs('controller_'.$action))
+                        if(self::saved_costs('controller_'.$action) && self::$debug)
                             echo 'COST OF CONTROLLER '.$action.': '.self::get_cost('controller_'.$action);
                         self::exec_footers();
                     } else _error_::set(E4.' '.htmlentities($action), LVL_FATAL);

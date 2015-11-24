@@ -28,3 +28,4 @@ Why? you test, evaluate, and improve each function in your script to get the bes
 OTHERS CHANGES:
 
 * fix bug in ORM
+* Control resource consumption don't show if debug mode is off
