@@ -1,6 +1,5 @@
 <?php
 
-require('functions.php');
 require('class.date.php');
 require('class.inputvars.php');
 
@@ -11,6 +10,7 @@ define('E2', '<b>Error</b> E2::2 no existe el archivo controlador correspondient
 define('E3', '<b>Error</b> E3::3 acción solicitada no disponible [core#098]');
 define('E4', '<b>Error</b> E4::4 La funcion definida en el controlador no es calleable [core#097]');
 define('E5', '<b>Error</b> E5::5 Declaraci&oacute;n de modelo inexistente [core#073]');
+define('E6', '<b>Error</b> E6::6 EL COMPONENTE NO EXISTE [core#??]');
 
 require('default_config/dbData.php');
 
@@ -44,9 +44,9 @@ class _
             ini_set('display_errors', false);
             error_reporting(0);
         }
-        self::$view = load_component('view'); // raintpl?
-        self::$db = load_component('db');
-        load_component('orm');
+        self::$view = self::declare_component('view'); // raintpl?
+        self::$db = self::declare_component('db');
+        self::declare_component('orm');
         self::$post = self::parse_post();
         self::$get = self::parse_get();
         self::$request = self::parse_request();
@@ -67,7 +67,7 @@ class _
             self::$controllers[$controller] = $file;
         }
     }
-    
+
     static public function declare_model($file)
     {
         $file = strtolower(trim($file));
@@ -84,6 +84,22 @@ class _
             self::$extras[] = $file;
             require_once('extras/'.$file.'.php');
         }
+    }
+    
+    static public function declare_component($name)
+    {
+        if(file_exists('components/'.$name.'.php'))
+        {
+            return require_once('components/'.$name.'.php');
+        } else if(file_exists('components/thirdparty/'.$name.'.php'))
+        {
+            return require_once('components/thirdparty/'.$name.'.php');
+        } else die(E6.' components/thirdparty/'.$file.'.php');
+    }
+    
+    static public function define_autocall($function)
+    {
+        $function();
     }
     
     static public function define_controller($action, $function)
@@ -138,7 +154,6 @@ class _
     
     static private function parse_session()
     {
-        // HAY QUE AGREGAR SOPORTE PARA ARREGLOS POR URL y POST
         $out = array();
         if(is_array($_SESSION))
         {
@@ -251,13 +266,13 @@ class _
     
     static public function load_requires()
     {
-        if(defined('REQUIRE_SEARCHER') and REQUIRE_SEARCHER == true) load_component('searcher');
+        // deprecated :(
+        //if(defined('REQUIRE_SEARCHER') and REQUIRE_SEARCHER == true) load_component('searcher');
+        // for backward compatibility reasons:
+        if(defined('REQUIRE_SEARCHER') and REQUIRE_SEARCHER == true)
+            self::declare_component('searcher');
     }
     
-    static public function define_autocall($function)
-    {
-        $function();
-    }
 }
 
 spl_autoload_register(function($class){

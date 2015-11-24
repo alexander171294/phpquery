@@ -1,4 +1,3 @@
-2º improve load_requires function. (improve speed)
 3º improve error system. (make easy debug the code)
 4º add control resource consumption.
 5º add documentation
