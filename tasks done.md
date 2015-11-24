@@ -17,6 +17,8 @@ Why? you test, evaluate, and improve each function in your script to get the bes
 
 6º delete functions.php, this file is not necessary
 
+8º improve _date to support initial value and add clear format.
+
 
 10º replace attach_header for define_autocall
 * now, attach_header not use a stack for load, is changed for _::define_autocall()
