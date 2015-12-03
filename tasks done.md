@@ -17,6 +17,8 @@ Why? you test, evaluate, and improve each function in your script to get the bes
 
 6º delete functions.php, this file is not necessary
 
+7º Check backward compatibility with older version of the framework.
+
 8º improve _date to support initial value and add clear format.
 * now you construct object _date using a unixstamp in replace of time(), use for create _date of value in db.
 
@@ -42,5 +44,6 @@ OTHERS CHANGES:
 
 * fix bug in ORM
 * fix bug in view class
+* improve view class deleting .h, header.var, and reduce the cost of resources in 32%
 * improve performance in views
 * Control resource consumption don't show if debug mode is off
