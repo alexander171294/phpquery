@@ -40,8 +40,6 @@ class template
         foreach($this->includes as $include)
         {
             // crear index
-            if(!file_exists(tplData::$cacheDir.$include['filename'].'.h') or $forceReWork)
-                $this->reWorkIndex($include['filename']);
             if(!file_exists(tplData::$cacheDir.$include['filename'].'.tmp') or $forceReWork)
                 $this->reWork($include);
         }
@@ -59,16 +57,6 @@ class template
         
         // aquí procesamos las variables
         file_put_contents(tplData::$cacheDir.$fileData['filename'].'.tmp', $source);
-    }
-    
-    public function reWorkIndex($fname)
-    {
-        $out = '<?php '.PHP_EOL;
-        foreach($this->values as $variable => $value)
-        {
-            $out .= '$'.$variable.' = $_[\''.$variable.'\'];'.PHP_EOL;
-        }
-        file_put_contents(tplData::$cacheDir.$fname.'.h', $out);
     }
     
     public function replaceEntities($source)
@@ -141,9 +129,9 @@ class template
     public function loadCache()
     {
         $_ = $this->values;
+        extract($_); //this replace all .h
         foreach($this->includes as $include)
         {
-            include(tplData::$cacheDir.$include['filename'].'.h');
             include(tplData::$cacheDir.$include['filename'].'.tmp');
         }
     }
