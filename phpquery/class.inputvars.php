@@ -132,7 +132,42 @@ class objectVar
         $url = preg_replace ($find, $repl, $url);
         $this->toOut = $url;
         return $this;
-
+    }
+    
+    public function find($match, $type = FILTER_DEFAULT)
+    {
+        if($type == FILTER_DEFAULT)
+            return strpos($this->toOut, $match);
+        else if($type == USE_REGEX)
+        {
+            $matchs = array();
+            $res = preg_match_all($match,$this->toOut,$matchs);
+            if($res) return $matchs;
+            return false;
+        } else return $this;
+    }
+    
+    public function filter($match, $type = FILTER_DELETE, $value = null)
+    {
+        if($type == FILTER_DELETE)
+        {
+            $this->toOut = str_replace($match, $value, $this->toOut);
+            return $this;
+        } elseif($type == FILTER_TO_EOL)
+        {
+            $in = strpos($this->toOut, $match);
+            $this->toOut = substr($this->toOut, 0, $in);
+            return $this;
+        } elseif($type == FILTER_TO_SOL)
+        {
+            $in = strpos($this->toOut, $match);
+            $this->toOut = substr($this->toOut, $in, $this->len());
+            return $this;
+        } elseif($type == USE_REGEX)
+        {
+            $this->toOut = preg_replace($match, $value, $this->toOut);
+            return $this;
+        } else return null;
     }
     
 }
