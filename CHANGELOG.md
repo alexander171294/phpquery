@@ -1,34 +1,35 @@
 CHANGELOG OF THE VERSION 1.0.1
 
-- add autoload to models. (make easy load models)
+o add autoload to models. (make easy load models)
 * now isn't necessary write _::declare_model(), is autodeclared by spl_autoload_class (PHP CORE)
 
-- improve load_requires function. (improve speed)
+o improve load_requires function. (improve speed)
 * now, isn't load always the components, now loads by demand
 
-- improve error system. (make easy debug the code)
+o improve error system. (make easy debug the code)
 * now, the errors system equipped with a bugtrace, errors levels, and is possible you set custom error function to catch errors.
 
-- add control resource consumption.
+o add control resource consumption.
 * now, you can add third parameter to define_controller and second parameter to define_autocall, is boolean, if they value is true, show seconds and memory used to execute the controller or autocall function.
 * now, you can put var_dump to _::get_cost() in the end of file index for see memory usage, and seconds of execution of all code. 
 Why? you test, evaluate, and improve each function in your script to get the best performance.
 
-- split examples.
+o split examples.
 * now, the examples are commented and splitted
 
-- delete functions.php, this file isn't longer necessary 
+o delete functions.php, this file isn't longer necessary 
 
-- Checked backward compatibility with older version of the framework.
+o Checked backward compatibility with older version of the framework.
 
-- improve "date" to support initial value and add "clear format" function.
+o improve "date" to support initial value and add "clear format" function.
 * now you construct object "date" using a unixstamp in replace of time(), use for create "date" of value in db.
 
-- debug view class.
+o debug view class.
 * now you can use {function}, fixed {if} 
 
-- replace "attach header" for "define autocall"
+o replace "attach header" for "define autocall"
 * now, attach_header not use a stack for load, is changed for _::define_autocall()
+
 [!] for backward compatibility to older versions of PHPQuery, attach_header works, but is an alias of _::define_autocall() (you don't have problem with compatibility)
 [!] we recommend you change attach header for define_autocall if it can. Why? we delete in the future this function for reduce resource cost.
 
