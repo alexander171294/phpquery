@@ -37,12 +37,11 @@ class template
         if(DEVMODE)
             $forceReWork = true;
             
-        // crear index
-        if(!file_exists(tplData::$cacheDir.'headers.var') or $forceReWork)
-            $this->reWorkIndex();
-        
         foreach($this->includes as $include)
         {
+            // crear index
+            if(!file_exists(tplData::$cacheDir.$include['filename'].'.h') or $forceReWork)
+                $this->reWorkIndex($include['filename']);
             if(!file_exists(tplData::$cacheDir.$include['filename'].'.tmp') or $forceReWork)
                 $this->reWork($include);
         }
@@ -62,14 +61,14 @@ class template
         file_put_contents(tplData::$cacheDir.$fileData['filename'].'.tmp', $source);
     }
     
-    public function reWorkIndex()
+    public function reWorkIndex($fname)
     {
         $out = '<?php '.PHP_EOL;
         foreach($this->values as $variable => $value)
         {
             $out .= '$'.$variable.' = $_[\''.$variable.'\'];'.PHP_EOL;
         }
-        file_put_contents(tplData::$cacheDir.'headers.var', $out);
+        file_put_contents(tplData::$cacheDir.$fname.'.h', $out);
     }
     
     public function replaceEntities($source)
@@ -142,9 +141,9 @@ class template
     public function loadCache()
     {
         $_ = $this->values;
-        include(tplData::$cacheDir.'headers.var');
         foreach($this->includes as $include)
         {
+            include(tplData::$cacheDir.$include['filename'].'.h');
             include(tplData::$cacheDir.$include['filename'].'.tmp');
         }
     }
