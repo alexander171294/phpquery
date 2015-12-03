@@ -17,19 +17,19 @@ Why? you test, evaluate, and improve each function in your script to get the bes
 - split examples.
 * now, the examples are commented and splitted
 
-- delete functions.php, this file is not necessary
+- delete functions.php, this file isn't longer necessary 
 
-- Check backward compatibility with older version of the framework.
+- Checked backward compatibility with older version of the framework.
 
-- improve _date to support initial value and add clear format.
-* now you construct object _date using a unixstamp in replace of time(), use for create _date of value in db.
+- improve "date" to support initial value and add "clear format" function.
+* now you construct object "date" using a unixstamp in replace of time(), use for create "date" of value in db.
 
 - debug view class.
 * now you can use {function}, fixed {if} 
 
-- replace attach_header for define_autocall
+- replace "attach header" for "define autocall"
 * now, attach_header not use a stack for load, is changed for _::define_autocall()
-[!] for backward compatibility to older versions of PHPQuery, attach_header work, but is an alias of _::define_autocall() (you don't have problem with compatibility)
+[!] for backward compatibility to older versions of PHPQuery, attach_header works, but is an alias of _::define_autocall() (you don't have problem with compatibility)
 [!] we recommend you change attach header for define_autocall if it can. Why? we delete in the future this function for reduce resource cost.
 
 [!!!] WE RECOMMEND YOU CHANGE ALL DEPRECATED FUNCTIONS IF IT CAN, WE DELETE IN THE FUTURE ALL DEPRECATED FUNCTIONS FOR REDUCE RESOURCE COST!
