@@ -7,7 +7,8 @@ class template
 {
     protected $includes = array();
     protected $values = array();
-    protected $isAjax = false;
+    public $isAjax = false;
+    
     
     public function show($file)
     {
@@ -23,8 +24,13 @@ class template
     
     public function ajax($var)
     {
-        $this->isAjax = true;
-        echo json_encode($var);
+        $this->ajax_plain(json_encode($var));
+    }
+    
+    public function ajax_plain($data)
+    {
+    	$this->isAjax = true;
+    	echo $data;
     }
     
     public function execute()
@@ -110,18 +116,10 @@ class template
         $source = str_replace('{url}','http://'.$_SERVER['HTTP_HOST'], $source);
         $source = str_replace('{url:full}','http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $source);
         
-        // ESTO VA EN PREG_MATCH_ALL //
-        // ahora la url
-        /*
-        $regex = '/\{url\:\?([a-zA-Z0-9_]*)\}/';
-        
-        // encontrar el page para eliminarle
-        $match = null;
-        preg_match($regex,$source,$match);
-        $uri = EliminaParametroURL($_SERVER['REQUEST_URI'],$match[1]);
-        $adding = strpos($uri,'?')!== false ? '&' : '?';
-        $regex2 = 'http://'.$_SERVER['HTTP_HOST'].$uri.$adding.'$1';
-        $source = preg_replace($regex, $regex2, $source);*/
+        // ahora las globales
+        $regex = '/\{\%([a-zA-Z0-9_]*)\%\}/';
+        $regex2 = '<?=_::$globals[\'$1\'];?>';
+        $source = preg_replace($regex, $regex2, $source);
         
         return $source;
     }
