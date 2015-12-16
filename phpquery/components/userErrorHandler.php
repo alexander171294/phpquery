@@ -28,6 +28,6 @@ class _e
 	
 	public function loadLanguage($file)
 	{
-		self::$language = json_decode(file_get_contents($file));
+		self::$language = get_object_vars(json_decode(file_get_contents($file)));
 	}
 }
