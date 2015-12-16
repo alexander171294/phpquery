@@ -20,6 +20,8 @@ require('default_config/dbData.php');
 
 require('default_config/tplData.php');
 
+require('default_config/coreData.php');
+
 class _
 {
     static public $db = null;
@@ -84,10 +86,10 @@ class _
     static public function declare_model($file)
     {
         $file = strtolower(trim($file));
-        if(file_exists('models/'.$file.'.php'))
+        if(file_exists(coreData::$m.$file.'.php'))
         {
-            require_once('models/'.$file.'.php');
-        } else _error_::set(E5.' models/'.$file.'.php', LVL_FATAL);
+            require_once(coreData::$m.$file.'.php');
+        } else _error_::set(E5.' '.coreData::$m.$file.'.php', LVL_FATAL);
     }
     
     static public function declare_extra($file)
@@ -95,19 +97,19 @@ class _
         if(!in_array($file, self::$extras))
         {
             self::$extras[] = $file;
-            require_once('extras/'.$file.'.php');
+            require_once(coreData::$extra.$file.'.php');
         }
     }
     
     static public function declare_component($name)
     {
-        if(file_exists(__DIR__.'/components/'.$name.'.php'))
+        if(file_exists(__DIR__.coreData::$component.$name.'.php'))
         {
-            return require_once(__DIR__.'/components/'.$name.'.php');
-        } else if(file_exists(__DIR__.'/components/thirdparty/'.$name.'.php'))
+            return require_once(__DIR__.coreData::$component.$name.'.php');
+        } else if(file_exists(__DIR__.coreData::$component.'thirdparty/'.$name.'.php'))
         {
-            return require_once(__DIR__.'/components/thirdparty/'.$name.'.php');
-        } else _error_::set(E6.' components/thirdparty/'.$name.'.php', LVL_FATAL);
+            return require_once(__DIR__.coreData::$component.'thirdparty/'.$name.'.php');
+        } else _error_::set(E6.' '.coreData::$component.'thirdparty/'.$name.'.php', LVL_FATAL);
     }
     
     static public function define_autocall($function, $calculate_costs = false)
@@ -137,13 +139,13 @@ class _
     	self::$globals['controller'] = $action;
         if(isset(self::$controllers[$action]))
         {
-            if(file_exists('controllers/'.self::$controllers[$action].'.php'))
+            if(file_exists(coreData::$c.self::$controllers[$action].'.php'))
             {
                 if(!in_array($action, self::$loaded))
                 {
                     self::$loaded[] = $action;
                     self::$globals['fileController'] = self::$controllers[$action];
-                    require('controllers/'.self::$controllers[$action].'.php');
+                    require(coreData::$c.self::$controllers[$action].'.php');
                 }
                 if(isset(self::$actions[$action]))
                 {
