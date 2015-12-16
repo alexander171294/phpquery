@@ -3,9 +3,10 @@
 ## Actual version:
 
 In develop: 1.0-RC2
+
 Released version: 1.0-RC1
 
-Next version published 24/12/15 or not, i don't know xD
+Next version published 20/12/15 this time i know it is so. xD
 
 ## ATENTION
 
