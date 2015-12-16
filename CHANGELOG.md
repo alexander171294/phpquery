@@ -30,6 +30,18 @@ o debug view class.
 o replace "attach header" for "define autocall"
 * now, attach_header not use a stack for load, is changed for _::define_autocall()
 
+o Added user error handler
+* now, you can make own errors, standarized and translatable
+
+o new component curl added
+* simple function to get ssl page using curl
+
+o added component youtubeDownloader
+* simple class to get information about video in youtube
+
+o added ajax_plain, and globals vars to view
+* now you can call ajax_plain to show plain text, and access to globals vars
+
 [!] for backward compatibility to older versions of PHPQuery, attach_header works, but is an alias of _::define_autocall() (you don't have problem with compatibility)
 [!] we recommend you change attach header for define_autocall if it can. Why? we delete in the future this function for reduce resource cost.
 
@@ -47,6 +59,7 @@ OTHERS CHANGES:
 
 * fix bug in ORM
 * fix bug in view class
+* fix singleton in line 10
 * improve view class deleting .h, header.var, and reduce the cost of resources in 32%
 * improve performance in views
 * Control resource consumption don't show if debug mode is off
