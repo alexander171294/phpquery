@@ -32,6 +32,8 @@ class _
     static public $request = array();
     static public $cookie = array();
     
+    static public $globals = array();
+    
     static protected $files = null;
     static protected $controllers = array();
     static protected $actions = null;
@@ -54,7 +56,7 @@ class _
             ini_set('display_errors', false);
             error_reporting(0);
         }
-        self::declare_component('error');
+        self::declare_component('errorHandler');
         self::$view = self::declare_component('view'); // raintpl?
         self::$db = self::declare_component('db');
         self::declare_component('orm');
@@ -132,7 +134,7 @@ class _
     
     static public function execute($action)
     {
-
+    	self::$globals['controller'] = $action;
         if(isset(self::$controllers[$action]))
         {
             if(file_exists('controllers/'.self::$controllers[$action].'.php'))
@@ -140,6 +142,7 @@ class _
                 if(!in_array($action, self::$loaded))
                 {
                     self::$loaded[] = $action;
+                    self::$globals['fileController'] = self::$controllers[$action];
                     require('controllers/'.self::$controllers[$action].'.php');
                 }
                 if(isset(self::$actions[$action]))
