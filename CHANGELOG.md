@@ -60,6 +60,7 @@ OTHERS CHANGES:
 * fix bug in ORM
 * fix bug in view class
 * fix singleton in line 10
+* fix cache folders in view class
 * improve view class deleting .h, header.var, and reduce the cost of resources in 32%
 * improve performance in views
 * Control resource consumption don't show if debug mode is off
