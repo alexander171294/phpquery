@@ -96,6 +96,8 @@ abstract class table
             $this->lastQuery = array('query' => 'INSERT INTO '.self::tablename().'('.$fields.') VALUES('.$valuesString.')', 'values' => $values);
             $this->makeQuery();
             
+            $this->new = false;
+            
             return self::$pdo->lastInsertId();
         } else { // update
             $values = array();
