@@ -8,5 +8,5 @@ class coreData
 	static public $c = 'controllers/';
 	static public $extra = 'extras/';
 	
-	static protected $component = '/components/';
+	static public $component = '/components/';
 }
