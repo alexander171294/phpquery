@@ -30,6 +30,7 @@ class _
     static public $session = null;
     
     static public $post = array();
+    static public $isPost = false;
     static public $get = array();
     static public $request = array();
     static public $cookie = array();
@@ -67,6 +68,7 @@ class _
         self::$request = self::parse_request();
         self::$session = self::parse_session();
         self::$cookie = self::parse_cookie();
+        self::$isPost = $_SERVER['REQUEST_METHOD'] == 'POST';
         
         self::load_requires();
     }
