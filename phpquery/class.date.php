@@ -5,9 +5,12 @@ class _date
     protected $time;
     protected $format = null;
     
-    public function __construct()
+    public function __construct($initial = 0)
     {
-        $this->time = time();
+        if($initial < 1)
+            $this->time = time();
+        else
+            $this->time = $initial;
     }
     
     public function seconds($cant)

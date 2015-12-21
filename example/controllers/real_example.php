@@ -1,64 +1,97 @@
 <?php
 
+// extras are loadeds since extras folder.
 _::declare_extra('funciones');
 
-// las cosas que tenemos que declarar siempre
+// this function is execute automatically when this file is load
 _::define_autocall(function(){
+                // require a model
+                // ATENTION: SINCE 1.0.1 VERSION, THIS IS NOT NECESSARY, USE AUTOLOAD, BUT THIS WORK ANYWAY FOR BACKWARD COMPATIBILITY
                 _::declare_model('usuarios');
+                // declare other model:
                 _::declare_model('planes');
-                
+                // call user defined function.
                 basic_headers();
         });
 
 
-// definimos el controlador 'home'
+// this define a controller home
+// is called by url param, you see index.php for more info.
 _::define_controller('home', function(){
         
+        // checkLogin is user defined function.
+        // _::redirect is a framework function to make a internal redirection (without header(location))
+        // the first param is the name of te controller to be called.
+        // you able to add second param to force redirect using header('LOCATION ');, but in this case, you need use url in the first param.
         if(!checkLogin()) { _::redirect('login'); return false; }
         
+        // this call to function show of the TPL manager, in this case using the default template manager
+        // and like include index.tpl
         _::$view->show('index');
         
     });
 
+// define a login controller (for example).
 _::define_controller('login', function(){
+
                 define('EXTERA_PAGE', true);
+                
+                // assign variable "error" to view, and the value void ''
                 _::$view->assign('error', '');
                 _::$view->show('login'); 
         });
 
+        
 _::define_controller('login2', function(){
                 define('EXTERA_PAGE', true);
                 try{
+                        // using $post parsed
+                        // this return an object of type postVar
                         $nick = _::$post['user'];
                         $pass = _::$post['password'];
+                        // using len function of postVar
                         if($nick->len()<3) throw new exception('Nick invalido');
+                        // existis is a static function of usuarios model.
                         $id = usuarios::exists((string)$nick);
+                        
                         if($id === false) throw new exception('No existe un usuario con este nick');
+                        
+                        // this make a record of usuarios table, using $id to specificate value of primary key
+                        // this like as 'SELECT * FROM usuarios WHERE primary_key = $id
+                        // $id automatically filtered.
+                        // after execute query, the ORM class dump results in the properties of the object
                         $usuario = new usuarios($id);
+                        
+                        // the object $usuario have a property for each field of the table usuarios.
+                        
                         if(!$pass->check($usuario->pass_usuario)) throw new exception('La contrase&ntilde;a no es valida');
                         
-                        // existe
+                        // this construct an object of $_SESSION var
                         $session = new sessionVar('loggued');
+                        // change the value to true
                         $session->set(true);
+                        // make other object of $_SESSION but this time for $_SESSION['token']
                         $token = new sessionVar('token');
+                        // call to user defined function
                         $ht = csrf_token();
+                        // change value to $_SESSION
                         $token->set($ht);
+                        
+                        
                         $idSess = new sessionVar('id');
                         $idSess->set($id);
                         
                         // tenemos un plan asignado?
                         if($usuario->plan_usuario>0)
                         {
-                                // si estamos pagados
+                                // class _date is from the framework.
                                 $date = new _date();
+                                
                                 if($usuario->fecha_pago_usuario >= $date->count())
                                 {
-                                        // estamos al día
+                                        // redirect using force header('location: '.$param1);
                                         _::redirect('/'.$ht.'/home.html', false);
                                 } else { // sin pagar
-                                        // tratamos de debitar del dinero interno
-                                        
-                                        // si no podemos
                                         _::redirect('/'.$ht.'/pagar.html', false);
                                 }
                         } else _::redirect('/'.$ht.'/new_plan.html', false);
@@ -133,10 +166,11 @@ _::define_controller('registro2', function(){ // todo: codigo promocional; selec
                         
                         $user->cuenta_activa = 1;
                         
+                        // THIS SAVE THE NEW DATA IN THE OBJECT, DUMPING ALL DATA IN TABLE
+                        // like as INSERT or UPDATE depending if the object construct using parametter to specify primary key or not
                         $user->save();
 
                         // hay que enviar mail aquí
-                        
                         
                         _::$view->show('registro_ok');
                         
@@ -144,9 +178,4 @@ _::define_controller('registro2', function(){ // todo: codigo promocional; selec
                         _::$view->assign('error', $e->getMessage());
                         _::$view->show('registro');
                 }
-        });
-
-_::define_controller('recordar_pass', function(){
-                define('EXTERA_PAGE', true);
-                _::$view->show('recordar');
         });

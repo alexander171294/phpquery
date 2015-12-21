@@ -1,25 +1,36 @@
 <?php
 
+define('eTPL1', 'eTPL1::1 don\'t exists view ');
+define('eTPL2', 'eTPL2::2 you can\'t name a variable with void string');
+
 class template
 {
     protected $includes = array();
     protected $values = array();
-    protected $isAjax = false;
+    public $isAjax = false;
+    
     
     public function show($file)
     {
-        $this->includes[] = array('source' => tplData::$folder.$file.tplData::$extension, 'filename' => $file);
+        if(!file_exists(tplData::$folder.$file.tplData::$extension)) _error_::set(eTPL1.$file.tplData::$extension, LVL_FATAL);
+        else $this->includes[] = array('source' => tplData::$folder.$file.tplData::$extension, 'filename' => $file);
     }
     
     public function assign($var, $content)
     {
+        if(empty($var)) _error_::set(eTPL2, LVL_FATAL);
         $this->values[$var] = $content;
     }
     
     public function ajax($var)
     {
-        $this->isAjax = true;
-        echo json_encode($var);
+        $this->ajax_plain(json_encode($var));
+    }
+    
+    public function ajax_plain($data)
+    {
+    	$this->isAjax = true;
+    	echo $data;
     }
     
     public function execute()
@@ -31,9 +42,10 @@ class template
             $forceReWork = true;
         if(DEVMODE)
             $forceReWork = true;
-        
+            
         foreach($this->includes as $include)
         {
+            // crear index
             if(!file_exists(tplData::$cacheDir.$include['filename'].'.tmp') or $forceReWork)
                 $this->reWork($include);
         }
@@ -55,19 +67,24 @@ class template
     
     public function replaceEntities($source)
     {
-        
+
         //bucles
         $regex = '/\{loop=\$([a-zA-Z0-9_]*)(\-\>\[\')*(.*)\ as \$([a-zA-Z0-9_]*) to \$([a-zA-Z0-9_]*)}/';
-        $regex2 = '<?php foreach(\$_[\'$1\']$2$3 as \$_[\'$4\'] => \$_[\'$5\']){ ?>';
+        $regex2 = '<?php foreach(\$$1$2$3 as \$$4 => \$$5){ ?>';
         $source = preg_replace($regex, $regex2, $source);
         
         $regex = '/\{loop=\$([a-zA-Z0-9_]*)(\-\>\[\')*(.*)\ as \$([a-zA-Z0-9_]*)}/';
-        $regex2 = '<?php foreach(\$_[\'$1\']$2$3 as \$_[\'$4\']){ ?>';
+        $regex2 = '<?php foreach(\$$1$2$3 as \$$4){ ?>';
         $source = preg_replace($regex, $regex2, $source);
         
         //if
-        $regex = '/\{if=\"(.*)\"\}/';
+        $regex = '/\{if=\"([^\"]*)\"\}/';
         $regex2 = '<?php if($1){ ?>';
+        $source = preg_replace($regex, $regex2, $source);
+        
+        //function
+        $regex = '/\{function=\"([^\"]*)\"\}/';
+        $regex2 = '<?=$1;?>';
         $source = preg_replace($regex, $regex2, $source);
         
         // cierres
@@ -82,13 +99,13 @@ class template
         $source = preg_replace($regex, $regex2, $source);
         
         // var dump
-        $regex = '/\{dump=\$([a-zA-Z0-9_]*)(\-\>\[\')*([^\}]*)\}/';
-        $regex2 = '<?=var_dump(\$_[\'$1\']$2$3);?>';
+        $regex = '/\{dump=([^\}]*)\}/';
+        $regex2 = '<?=var_dump($1);?>';
         $source = preg_replace($regex, $regex2, $source);
         
         // primero procesamos las variables
-        $regex = '/\{\$([a-zA-Z0-9_]*)(\-\>\[\')*([^\}]*)\}/';
-        $regex2 = '<?=\$_[\'$1\']$2$3;?>';
+        $regex = '/\{\$([^\}]*)\}/';
+        $regex2 = '<?=\$$1;?>';
         $source = preg_replace($regex, $regex2, $source);
         
         // ahora las constantes
@@ -96,20 +113,13 @@ class template
         $regex2 = '<?=$1;?>';
         $source = preg_replace($regex, $regex2, $source);
         
-        $source = str_replace('{url}','http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $source);
+        $source = str_replace('{url}','http://'.$_SERVER['HTTP_HOST'], $source);
+        $source = str_replace('{url:full}','http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $source);
         
-        // ESTO VA EN PREG_MATCH_ALL //
-        // ahora la url
-        /*
-        $regex = '/\{url\:\?([a-zA-Z0-9_]*)\}/';
-        
-        // encontrar el page para eliminarle
-        $match = null;
-        preg_match($regex,$source,$match);
-        $uri = EliminaParametroURL($_SERVER['REQUEST_URI'],$match[1]);
-        $adding = strpos($uri,'?')!== false ? '&' : '?';
-        $regex2 = 'http://'.$_SERVER['HTTP_HOST'].$uri.$adding.'$1';
-        $source = preg_replace($regex, $regex2, $source);*/
+        // ahora las globales
+        $regex = '/\{\%([a-zA-Z0-9_]*)\%\}/';
+        $regex2 = '<?=_::$globals[\'$1\'];?>';
+        $source = preg_replace($regex, $regex2, $source);
         
         return $source;
     }
@@ -117,6 +127,7 @@ class template
     public function loadCache()
     {
         $_ = $this->values;
+        extract($_); //this replace all .h
         foreach($this->includes as $include)
         {
             include(tplData::$cacheDir.$include['filename'].'.tmp');
@@ -127,15 +138,15 @@ class template
 
 function EliminaParametroURL($url, $parametro)
 {
-list($urlpart, $qspart) = array_pad(explode('?', $url), 2, '');
-
-parse_str($qspart, $qsvars);
-
-unset($qsvars[$parametro]);
-
-$nuevoqs = http_build_query($qsvars);
-
-return $urlpart . '?' . $nuevoqs;
+    list($urlpart, $qspart) = array_pad(explode('?', $url), 2, '');
+    
+    parse_str($qspart, $qsvars);
+    
+    unset($qsvars[$parametro]);
+    
+    $nuevoqs = http_build_query($qsvars);
+    
+    return $urlpart . '?' . $nuevoqs;
 } 
 
 return new template();

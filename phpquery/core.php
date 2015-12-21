@@ -1,20 +1,26 @@
 <?php
 
-require('functions.php');
+_::set_time();
+
 require('class.date.php');
 require('class.inputvars.php');
 
 session_start();
 
-define('E1', '<b>Error</b> E1::1 el controlador no fue declarado [core#100]');
-define('E2', '<b>Error</b> E2::2 no existe el archivo controlador correspondiente [core#099]');
-define('E3', '<b>Error</b> E3::3 acción solicitada no disponible [core#098]');
-define('E4', '<b>Error</b> E4::4 La funcion definida en el controlador no es calleable [core#097]');
-define('E5', '<b>Error</b> E5::5 Declaraci&oacute;n de modelo inexistente [core#073]');
+define('E1', 'The controller hasn\'t is declared ::');
+define('E2', 'The file of the controller isn\'t exists ::');
+define('E3', 'The request action isn\'t exists ::');
+define('E4', 'The function defined on the controller is not callable ::');
+define('E5', 'Declaration of non-existent model ::');
+define('E6', 'Failed to load component ::');
+define('E7', 'define_autocall, the function isn\'t callable ::');
+define('E8', 'attach_footer, the function isn\'t callable ::');
 
 require('default_config/dbData.php');
 
 require('default_config/tplData.php');
+
+require('default_config/coreData.php');
 
 class _
 {
@@ -24,20 +30,28 @@ class _
     static public $session = null;
     
     static public $post = array();
+    static public $isPost = false;
     static public $get = array();
     static public $request = array();
     static public $cookie = array();
     
+    static public $globals = array();
+    
     static protected $files = null;
     static protected $controllers = array();
     static protected $actions = null;
-    static protected $headers = array();
     static protected $footers = array();
     static protected $extras = array();
     static protected $loaded = array();
     
+    // statics of use
+    static protected $time = array();
+    static protected $memory = array();
+    static protected $debug = false;
+    
     static public function init($debug = true)
     {
+        self::$debug = $debug;
         if($debug)
         {
             ini_set('display_errors', true);
@@ -45,14 +59,16 @@ class _
             ini_set('display_errors', false);
             error_reporting(0);
         }
-        self::$view = load_component('view'); // raintpl?
-        self::$db = load_component('db');
-        load_component('orm');
+        self::declare_component('errorHandler');
+        self::$view = self::declare_component('view'); // raintpl?
+        self::$db = self::declare_component('db');
+        self::declare_component('orm');
         self::$post = self::parse_post();
         self::$get = self::parse_get();
         self::$request = self::parse_request();
         self::$session = self::parse_session();
         self::$cookie = self::parse_cookie();
+        self::$isPost = $_SERVER['REQUEST_METHOD'] == 'POST';
         
         self::load_requires();
     }
@@ -68,14 +84,14 @@ class _
             self::$controllers[$controller] = $file;
         }
     }
-    
+
     static public function declare_model($file)
     {
         $file = strtolower(trim($file));
-        if(file_exists('models/'.$file.'.php'))
+        if(file_exists(coreData::$m.$file.'.php'))
         {
-            require_once('models/'.$file.'.php');
-        } else die(E5.' models/'.$file.'.php');
+            require_once(coreData::$m.$file.'.php');
+        } else _error_::set(E5.' '.coreData::$m.$file.'.php', LVL_FATAL);
     }
     
     static public function declare_extra($file)
@@ -83,54 +99,79 @@ class _
         if(!in_array($file, self::$extras))
         {
             self::$extras[] = $file;
-            require_once('extras/'.$file.'.php');
+            require_once(coreData::$extra.$file.'.php');
         }
     }
     
-    static public function define_controller($action, $function)
+    static public function declare_component($name)
     {
+        if(file_exists(__DIR__.coreData::$component.$name.'.php'))
+        {
+            return require_once(__DIR__.coreData::$component.$name.'.php');
+        } else if(file_exists(__DIR__.coreData::$component.'thirdparty/'.$name.'.php'))
+        {
+            return require_once(__DIR__.coreData::$component.'thirdparty/'.$name.'.php');
+        } else _error_::set(E6.' '.coreData::$component.'thirdparty/'.$name.'.php', LVL_FATAL);
+    }
+    
+    static public function define_autocall($function, $calculate_costs = false)
+    {
+        if($calculate_costs && self::$debug) {
+            self::set_time('autocall');
+        }
+        if(is_callable($function))
+        {
+            $function();
+            if($calculate_costs && self::$debug)
+                echo 'COST OF AUTOCALL: '.self::get_cost('autocall');
+        }
+        else _error_::set(E7, LVL_FATAL);
+    }
+    
+    static public function define_controller($action, $function, $calculate_costs = false)
+    {
+        if($calculate_costs && self::$debug) {
+            self::set_time('controller_'.$action);
+        }
         self::$actions[$action] = $function;
     }
     
     static public function execute($action)
     {
-
+    	self::$globals['controller'] = $action;
         if(isset(self::$controllers[$action]))
         {
-            if(file_exists('controllers/'.self::$controllers[$action].'.php'))
+            if(file_exists(coreData::$c.self::$controllers[$action].'.php'))
             {
                 if(!in_array($action, self::$loaded))
                 {
                     self::$loaded[] = $action;
-                    require('controllers/'.self::$controllers[$action].'.php');
+                    self::$globals['fileController'] = self::$controllers[$action];
+                    require(coreData::$c.self::$controllers[$action].'.php');
                 }
                 if(isset(self::$actions[$action]))
                 {
                     $call = self::$actions[$action];
                     if(is_callable($call))
                     {
-                        self::exec_headers();
                         $call();
+                        // si exigimos calcular los costos
+                        if(self::saved_costs('controller_'.$action) && self::$debug)
+                            echo 'COST OF CONTROLLER '.$action.': '.self::get_cost('controller_'.$action);
                         self::exec_footers();
-                    } else die(E4.' '.htmlentities($action));
-                } else die(E3.' '.htmlentities($action));
-            } else die(E2.' '.htmlentities($action));
-        } else die(E1.' '.htmlentities($action));
+                    } else _error_::set(E4.' '.htmlentities($action), LVL_FATAL);
+                } else _error_::set(E3.' '.htmlentities($action), LVL_FATAL);
+            } else _error_::set(E2.' '.htmlentities($action), LVL_FATAL);
+        } else _error_::set(E1.' '.htmlentities($action), LVL_WARNING);
     }
     
-    static private function exec_headers()
-    {
-        foreach(self::$headers as $header)
-        {
-            $header();
-        }
-    }
-    
+    // alias of autocall, for backward compatibility reasons.
     static public function attach_header($function)
     {
-        self::$headers[] = $function;
+        self::define_autocall($function);
     }
     
+    // this is really interesting, i like delete this, but change my opinion.
     static private function exec_footers()
     {
         foreach(self::$footers as $footer)
@@ -141,12 +182,13 @@ class _
     
     static public function attach_footer($function)
     {
-        self::$footers[] = $function;
+        if(is_callable($function))
+            self::$footers[] = $function;
+        else _error_::set(E8, LVL_FATAL);
     }
     
     static private function parse_session()
     {
-        // HAY QUE AGREGAR SOPORTE PARA ARREGLOS POR URL y POST
         $out = array();
         if(is_array($_SESSION))
         {
@@ -259,11 +301,36 @@ class _
     
     static public function load_requires()
     {
-        if(defined('REQUIRE_SEARCHER') and REQUIRE_SEARCHER == true) load_component('searcher');
+        // deprecated :(
+        //if(defined('REQUIRE_SEARCHER') and REQUIRE_SEARCHER == true) load_component('searcher');
+        // for backward compatibility reasons:
+        if(defined('REQUIRE_SEARCHER') and REQUIRE_SEARCHER == true)
+            self::declare_component('searcher');
     }
     
-    static public function define_autocall($function)
+    static public function set_time($index = 'coreMain')
     {
-        $function();
+        self::$time[$index] =  microtime(true);
+        self::$memory[$index] = memory_get_usage();
+    }
+    
+    static public function get_cost($index = 'coreMain')
+    {
+        return number_format(microtime(true) - self::$time[$index], 4).' seconds of execution; '.self::formatbytes(memory_get_usage() - self::$memory[$index]).' used in memory';
+    }
+    
+    static public function saved_costs($index = 'coreMain')
+    {
+        return isset(self::$time[$index]);
+    }
+    
+    static private function formatbytes($size)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
 }
+
+spl_autoload_register(function($class){
+            _::declare_model($class);
+        });

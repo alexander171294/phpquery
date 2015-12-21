@@ -1,9 +1,9 @@
 <?php
 
 // ORM for php, designed for PDO and phpquery
-define('eORM1', '<b>ORM ERROR</b> eORM1::1 el modelo no cuenta con los campos correspondientes a la tabla [orm#53]');
-define('eORM2', '<b>ORM ERROR</b> eORM2::2 clave primaria no definida en modelo [orm#24]');
-define('eORM3', '<b>ORM ERROR</b> eORM3::3 claves primarias no coinciden en instanciacion [orm#30]');
+define('eORM1', 'eORM1::1 the fields on the model not match with fields in table ');
+define('eORM2', 'eORM2::2 primary key isn\'t defined in the model ');
+define('eORM3', 'eORM3::3 primary keys don\'t match in instantiation of table ');
 
 abstract class table
 {
@@ -22,13 +22,13 @@ abstract class table
     
     public function __construct($ids = null)
     {
-        if(empty($this->primaryKeys)) die(eORM2);
+        if(empty($this->primaryKeys)) _error_::set(eORM2.self::tablename(), LVL_FATAL);
         $this->describe();
         if(!empty($ids))
         {
             if(is_array($this->primaryKeys))
             {
-                if(count($this->primaryKeys) !== count($ids)) die(eORM3);
+                if(count($this->primaryKeys) !== count($ids))  _error_::set(eORM3.self::tablename(), LVL_FATAL);
                 $out = array();
                 for($i = 0; $i<count($this->primaryKeys); $i++)
                 {
@@ -52,7 +52,7 @@ abstract class table
         {
             if(!property_exists($this, $field))
             {
-                die(eORM1);
+                _error_::set(eORM1.' field:'.$field.' table:'.self::tablename(), LVL_WARNING);
             }
         }
     }
@@ -96,14 +96,27 @@ abstract class table
             $this->lastQuery = array('query' => 'INSERT INTO '.self::tablename().'('.$fields.') VALUES('.$valuesString.')', 'values' => $values);
             $this->makeQuery();
             
-            return self::$pdo->lastInsertId();
+            $this->new = false;
+            
+            $id = self::$pdo->lastInsertId();
+            if(!is_array($this->primaryKeys))
+            {
+            	$pk = $this->primaryKeys;
+            	$this->$pk = $id;
+            } else {
+            	$pk = $this->primaryKeys[0];
+            	$this->$pk = $id;
+            }
+            $this->populate(array($pk => $id));
+            
+            return $id;
         } else { // update
             $values = array();
             $changes = null;
             foreach($this->fields as $field)
             {
                 $changes .= $field.' = ?, ';
-                $values[] = $field;
+                $values[] = $this->$field;
             }
             $changes = trim($changes, ', ');
             $values = array_merge($values, $this->iwc_values);
