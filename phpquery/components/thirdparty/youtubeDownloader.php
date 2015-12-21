@@ -2,7 +2,7 @@
 
 class YouTube
 {
-	protected $videoInfoLink = 'http://www.youtube.com/get_video_info?&video_id={%ID%}&asv=3&el=detailpage&hl=en_US';
+	protected $videoInfoLink = 'http://www.youtube.com/get_video_info?video_id={%ID%}&asv=3&el=detailpage&hl=en_US';
 	protected $videoID = null;
 	protected $info = array();
 	protected $url = array();
@@ -16,12 +16,13 @@ class YouTube
 	
 	public function __construct($ytID)
 	{
-		$this->videoInfoLink = str_replace('{%ID%}', $ytID, $this->videoInfoLink);
-		$this->videoID = $ytID;
+		$this->videoID = $this->parseID($ytID);
+		$this->videoInfoLink = str_replace('{%ID%}', $this->videoID, $this->videoInfoLink);
 	}
 	
 	public function getInfo($curlCalleable)
 	{
+		
 		$ytData = $curlCalleable($this->videoInfoLink);
 		parse_str($ytData, $info);
 		$this->info = $info;
@@ -64,5 +65,12 @@ class YouTube
 			$mins = $mins % 60;
 		}
 		return ($hours<10 ? '0'.$hours : $hours).':'.($mins<10 ? '0'.$mins : $mins).':'.($seconds<10 ? '0'.$seconds : $seconds);
+	}
+	
+	protected function parseID($url)
+	{
+		$matches = null;
+		preg_match("/^(?:http(?:s)?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:(?:watch)?\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\/))([^\?&\"'>]+)/", $url, $matches);
+		if(isset($matches[1]) && !empty($matches[1])) return $matches[1]; else return $id;
 	}
 }
