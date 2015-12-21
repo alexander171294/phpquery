@@ -99,7 +99,7 @@ class template
         $source = preg_replace($regex, $regex2, $source);
         
         // var dump
-        $regex = '/\{dump=([^\)]*)\}/';
+        $regex = '/\{dump=([^\}]*)\}/';
         $regex2 = '<?=var_dump($1);?>';
         $source = preg_replace($regex, $regex2, $source);
         
