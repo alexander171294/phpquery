@@ -98,7 +98,18 @@ abstract class table
             
             $this->new = false;
             
-            return self::$pdo->lastInsertId();
+            $id = self::$pdo->lastInsertId();
+            if(!is_array($this->primaryKeys))
+            {
+            	$pk = $this->primaryKeys;
+            	$this->$pk = $id;
+            } else {
+            	$pk = $this->primaryKeys[0];
+            	$this->$pk = $id;
+            }
+            $this->populate(array($pk => $id));
+            
+            return $id;
         } else { // update
             $values = array();
             $changes = null;
