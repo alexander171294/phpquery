@@ -19,6 +19,7 @@ abstract class table
     
     public $lastQuery = null;
     public $lastError = null;
+    public $void = false;
     
     public function __construct($ids = null)
     {
@@ -57,7 +58,7 @@ abstract class table
         }
     }
     
-    public function populate($where)
+    public function populate($where, $preserve = false)
     {
         $attach = ' WHERE ';
         $params = array();
@@ -69,17 +70,21 @@ abstract class table
         $attach = rtrim($attach, 'AND ');
         $this->individualWhereClausule = $attach;
         $this->iwc_values = $params;
+        if($preserve) $oldQ = $this->lastQuery;
         $this->lastQuery = array('query' => 'SELECT * FROM '.self::tablename().$attach.' LIMIT 1', 'values' => $params);
-        $query = $this->makeQuery();
+        $query = $this->makeQuery(!$preserve);
+        if($preserve) $this->lastQuery = $oldQ;
         $values = $query->fetch(PDO::FETCH_ASSOC);
         if(is_array($values))
+        {
             foreach($values as $key => $value)
             {
                 $this->$key = $value;
             }
+        } else $this->void = true;
     }
     
-    public function save()
+    public function save($showPopulateError = false)
     {
         if($this->new)
         { // insert
@@ -107,7 +112,8 @@ abstract class table
             	$pk = $this->primaryKeys[0];
             	$this->$pk = $id;
             }
-            $this->populate(array($pk => $id));
+            
+            $this->populate(array($pk => $id), !$showPopulateError);
             
             return $id;
         } else { // update
@@ -127,11 +133,12 @@ abstract class table
         }
     }
     
-    private function makeQuery()
+    private function makeQuery($saveError = true)
     {
         $q = self::$pdo->prepare($this->lastQuery['query']);
         $q->execute($this->lastQuery['values']);
-        $this->lastError = $q->errorInfo();
+        if($saveError)
+        	$this->lastError = $q->errorInfo();
         return $q;
     }
     
@@ -148,7 +155,7 @@ abstract class table
     
     static public function tablename()
     {
-        return ltrim(get_called_class(),'table_');
+        return str_replace('table_',null,get_called_class());
     }
     
     static public function getAll($adding = null, $style = PDO::FETCH_ASSOC)
