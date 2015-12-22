@@ -27,6 +27,12 @@ class objectVar
         return $this;
     }
     
+    public function entities()
+    {
+    	$this->toOut = htmlentities($this->toOut);
+    	return $this;
+    }
+    
     public function noParseBR()
     {
         $this->toOut = $this->no_br;
