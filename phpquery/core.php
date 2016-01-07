@@ -1,4 +1,4 @@
-<?php
+<?php //changes: attach_footer $onTop, factory_error
 
 _::set_time();
 
@@ -13,8 +13,11 @@ define('E3', 'The request action isn\'t exists ::');
 define('E4', 'The function defined on the controller is not callable ::');
 define('E5', 'Declaration of non-existent model ::');
 define('E6', 'Failed to load component ::');
-define('E7', 'define_autocall, the function isn\'t callable ::');
-define('E8', 'attach_footer, the function isn\'t callable ::');
+define('E7', 'Define_autocall, the function isn\'t callable ::');
+define('E8', 'Attach_footer, the function isn\'t callable ::');
+define('E9', 'Factory, undefined Primary Key in array source. ::');
+define('E10', 'Factory, the class isn\'t exists. ::');
+define('E11', 'Factory, the array or primary key is null value. ::');
 
 require('default_config/dbData.php');
 
@@ -180,10 +183,17 @@ class _
         }
     }
     
-    static public function attach_footer($function)
+    static public function attach_footer($function, $onTop = false)
     {
         if(is_callable($function))
-            self::$footers[] = $function;
+        {
+        	if($onTop)
+        	{
+        		array_unshift(self::$footers, $function);
+        	}
+        	else
+        		self::$footers[] = $function;
+        }
         else _error_::set(E8, LVL_FATAL);
     }
     
@@ -281,10 +291,17 @@ class _
     
     static public function factory($array, $pk, $class)
     {
+    	if(!class_exists($class)) _error_::set(E10.' class: '.$class, LVL_FATAL);
+    	if(empty($pk) or !is_array($array)) _error_::set(E11.' pk: '.$pk, LVL_FATAL);
         $out = array();
+        $i = 0;
+        	if(!isset($array[0][$pk]))  _error_::set(E9.' class: '.$class.' iteration: Zero', LVL_WARNING);
+        	else
             foreach($array as $value)
             {
+            	if(!isset($value[$pk]))  _error_::set(E9.' class: '.$class.' iteration:'.$i, LVL_WARNING);
                 $out[] = new $class($value[$pk]);
+                $i++;
             }
         return $out;
     }
@@ -293,7 +310,7 @@ class _
     {
         if($internal)
         {
-            self::execute($target);
+            return self::execute($target);
         } else {
             header('Location: '.$target);
         }
