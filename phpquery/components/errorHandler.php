@@ -1,4 +1,4 @@
-<?php
+<?php // default deep changed
 
 // errors levels
 define('LVL_INFO', 10);
@@ -12,7 +12,7 @@ class _error_
 {
     static protected $lastError = array();
     
-    static public function set($msg, $error_lvl, $deep = 3)
+    static public function set($msg, $error_lvl, $deep = 2)
     {
         if(self::is_stop($error_lvl))
         {
@@ -27,11 +27,11 @@ class _error_
     
     static private function format_message($msg, $line, $elvl, $trace)
     {
-        return '<h1>Error</h1> '.
-                $msg.
+        return '<h1>Error</h1> <h4>Trace:</h4>'.
+                $trace.
+                ' <b>Error:</b> '.$msg.
                 ' in line <b>'.$line.'</b> '.
-                ' error level '.$elvl.'/100 <br /><br />'.
-                $trace;
+                ' error level '.$elvl.'/100 <br /><br />';
     }
     
     static public function get_trace($deep)
@@ -42,8 +42,9 @@ class _error_
         {
             for($i = $deep; $i<count($trace); $i++)
             {
-                $endTrace .= 'File: <b>'.$trace[$i]['file'].'</b>, line '.$trace[$i]['line'].', function '.$trace[$i]['function'].' <br />';
+                $endTrace = '[*] <b>'.$trace[$i]['file'].'</b>, line <b>'.$trace[$i]['line'].'</b>, function <i>'.$trace[$i]['function'].'()</i> <br />'.PHP_EOL.$endTrace;
             }
+            $endTrace .= '[!] ';
             return $endTrace;
         }
         return null;
