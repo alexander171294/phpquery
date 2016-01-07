@@ -1,4 +1,4 @@
-<?php // default deep changed
+<?php
 
 // errors levels
 define('LVL_INFO', 10);
