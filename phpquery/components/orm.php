@@ -4,6 +4,7 @@
 define('eORM1', 'eORM1::1 the fields on the model not match with fields in table ');
 define('eORM2', 'eORM2::2 primary key isn\'t defined in the model ');
 define('eORM3', 'eORM3::3 primary keys don\'t match in instantiation of table ');
+define('eORM4', 'eORM3::4 !attempt to save a property of type ');
 
 abstract class table
 {
@@ -136,10 +137,29 @@ abstract class table
     private function makeQuery($saveError = true)
     {
         $q = self::$pdo->prepare($this->lastQuery['query']);
+        $this->validateValues();
         $q->execute($this->lastQuery['values']);
         if($saveError)
         	$this->lastError = $q->errorInfo();
         return $q;
+    }
+    
+    private function validateValues()
+    {
+    	foreach($this->lastQuery['values'] as $key => $valueGroup)
+    	{
+    		if(is_object($valueGroup))
+    			_error_::set(eORM4.'OBJECT in table '.self::tablename().' field '.$this->fields[$key], LVL_FATAL);
+    		if(is_resource($valueGroup))
+    			_error_::set(eORM4.'RESOURCE in table '.self::tablename().' field '.$this->fields[$key], LVL_FATAL);
+    		if(is_link($valueGroup))
+    			_error_::set(eORM4.'LINK in table '.self::tablename().' field '.$this->fields[$key], LVL_FATAL);
+    		if(is_array($valueGroup))
+    		{
+    				_error_::set(eORM4.'ARRAY in table '.self::tablename().', then is transformed to JSON - field '.$this->fields[$key], LVL_WARNING);
+    				$this->lastQuery['values'][$key] = json_encode($this->lastQuery['values'][$key]);
+    		}
+    	}
     }
     
     public function delete()
