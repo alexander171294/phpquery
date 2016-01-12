@@ -1,4 +1,4 @@
-<?php
+<?php //changelog added validateValues()
 
 // ORM for php, designed for PDO and phpquery
 define('eORM1', 'eORM1::1 the fields on the model not match with fields in table ');
