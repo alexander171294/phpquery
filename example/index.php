@@ -10,8 +10,8 @@ define('DEVMODE', true);
 // this is obsolete after version 1.0.1
 // converted in _::declare_component('searcher');
 define('REQUIRE_SEARCHER', true);
-// now, require the core of PHPQuery, this is only line necessary
-require('phpquery/core.php');
+// now, require the loader of PHPQuery, this is only line necessary
+require('phpquery/loader.php');
 
 // this set new values for the default configuration of DB
 // see default config in phpquery/default_config/dbData.php
