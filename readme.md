@@ -6,7 +6,7 @@ In develop: 1.0-RC2
 
 Released version: 1.0-RC1
 
-Next version is published: ??
+Next version is published: 20/01/2016
 
 ## ATENTION
 
