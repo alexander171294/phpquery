@@ -17,7 +17,7 @@ class _error_
         if(self::is_stop($error_lvl))
         {
             die(self::format_message($msg, self::get_real_line($deep), $error_lvl, self::get_trace($deep)));
-        } else echo self::format_message($msg, self::get_real_line($deep), $error_lvl, self::get_trace($deep));
+        } else if(_::isDebug()) echo self::format_message($msg, self::get_real_line($deep), $error_lvl, self::get_trace($deep));
     }
     
     static private function is_stop($lvl)
