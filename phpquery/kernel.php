@@ -1,4 +1,4 @@
-<?php //changes: attach_footer $onTop, factory_error
+<?php //changes: factory multi PK
 
 session_start();
 
@@ -285,12 +285,22 @@ class _
     	if(empty($pk) or !is_array($array)) _error_::set(E11.' pk: '.$pk, LVL_FATAL);
         $out = array();
         $i = 0;
-        	if(!isset($array[0][$pk]))  _error_::set(E9.' class: '.$class.' iteration: Zero', LVL_WARNING);
+        $chkPk = is_array($pk) ? $pk[0] : $pk;
+        	if(!isset($array[0][$chkPk]))  _error_::set(E9.' class: '.$class.' iteration: Zero', LVL_WARNING);
         	else
             foreach($array as $value)
             {
-            	if(!isset($value[$pk]))  _error_::set(E9.' class: '.$class.' iteration:'.$i, LVL_WARNING);
-                $out[] = new $class($value[$pk]);
+            	if(!isset($value[$chkPk]))  _error_::set(E9.' class: '.$class.' iteration:'.$i, LVL_WARNING);
+                if(!is_array($pk))
+            		$out[] = new $class($value[$pk]);
+                else
+                {
+                	$array_constructor = array();
+                	foreach($pk as $ipk){
+                		$array_constructor[] = $value[$ipk];
+                	}
+                	$out[] = new $class($array_constructor);
+                }
                 $i++;
             }
         return $out;
@@ -335,6 +345,11 @@ class _
     {
         $unit=array('b','kb','mb','gb','tb','pb');
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
+    
+    static public function isDebug()
+    {
+    	return self::$debug;
     }
 }
 
