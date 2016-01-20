@@ -113,8 +113,8 @@ class template
         $regex2 = '<?=$1;?>';
         $source = preg_replace($regex, $regex2, $source);
         
-        $source = str_replace('{url}','http://'.$_SERVER['HTTP_HOST'], $source);
-        $source = str_replace('{url:full}','http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $source);
+        $source = str_replace('{url}','<?=$view_url_frk_core;?>', $source);
+        $source = str_replace('{url:full}','<?=$view_url_frk_core_full;?>', $source);
         
         // ahora las globales
         $regex = '/\{\%([a-zA-Z0-9_]*)\%\}/';
@@ -124,15 +124,63 @@ class template
         return $source;
     }
     
+    protected function isSSL()
+    {
+    	return ($_SERVER['SERVER_PORT']  == 443) || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on');
+    }
+    
     public function loadCache()
     {
         $_ = $this->values;
         extract($_); //this replace all .h
+        
+        $https = $this->isSSL();
+        $view_url_frk_core = 'http'.($https ? 's' : null).'://'.$_SERVER['HTTP_HOST'];
+        $view_url_frk_core_full = 'http'.($https ? 's' : null).'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
         foreach($this->includes as $include)
         {
             include(tplData::$cacheDir.$include['filename'].'.tmp');
         }
     }
+    
+    public function clearCache()
+    {
+    	$dir = $this->dirToArray(tplData::$cacheDir);
+    	$this->clear_dir_recursive($dir, tplData::$cacheDir);
+    }
+    
+    protected function dirToArray($dir)
+    {
+		$result = array();
+		$cdir = scandir($dir);
+		foreach ($cdir as $key => $value)
+		{
+			if (!in_array($value,array('.','..')))
+			{
+				if (is_dir($dir . DIRECTORY_SEPARATOR . $value))
+				{
+					$result[$value] = $this->dirToArray($dir . DIRECTORY_SEPARATOR . $value);
+				}
+				else
+				{
+					$result[] = $value;
+				}
+			}
+		}
+		return $result;
+	}
+	
+	protected function clear_dir_recursive($dir, $basedir)
+	{
+		foreach($dir as $key => $target)
+		{
+			// es una carpeta
+			if(is_array($target))
+				$this->clear_dir_recursive($target, $basedir.$key.'/');
+			else // es un archivo
+				unlink($basedir.$target);
+		}
+	}
 }
 
 
