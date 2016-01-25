@@ -13,10 +13,13 @@ define('E8', 'Attach_footer, the function isn\'t callable ::');
 define('E9', 'Factory, undefined Primary Key in array source. ::');
 define('E10', 'Factory, the class isn\'t exists. ::');
 define('E11', 'Factory, the array or primary key is null value. ::');
-define('PHPQuery_version', array('version_tag' => '1.0-RC2', 'version_value' => 102));
+
 
 class _
 {
+	// use compatibility declare_controller function
+	use declare_controller;
+	
     static public $db = null;
     static public $view = null;
     static public $models = null;
@@ -64,18 +67,6 @@ class _
         self::$isPost = $_SERVER['REQUEST_METHOD'] == 'POST';
         
         self::load_requires();
-    }
-    
-    static public function declare_controller($file, ...$controllers)
-    {
-        $file = strtolower(trim($file));
-        if(!isset(self::$files[$file]))
-            self::$files[$file] = true;
-        foreach($controllers as $controller)
-        {
-            $controller = strtolower(trim($controller));
-            self::$controllers[$controller] = $file;
-        }
     }
 
     static public function declare_model($file)
