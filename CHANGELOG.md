@@ -3,6 +3,7 @@ CHANGELOG OF THE VERSION 1.0-RC2
 Principal improvements
 * add Translate component (In progress).
 * add HTTP component (In progress).
+* add Experimental support for PHP 5.4
 
 Minor details:
 * add HTMLENTITIES to inputVars
