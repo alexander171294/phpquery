@@ -1,6 +1,7 @@
 <?php
 
 $version_array = array('version_tag' => '1.0-RC2', 'version_value' => 102);
+require('version.php');
 
 // check requeriments
 // check version
@@ -11,14 +12,12 @@ if(version_compare(PHP_VERSION, '5.4.0', '<')){
 	if(defined('PHPQUERY54') && PHPQUERY54 == true)
 	{
 		require('compatibility/kernel_54/declare_controller.php');
-		require('compatibility/kernel_54/version.php');
 	} else {
 		die('<b>FATAL ERROR</b> PHPQuery require PHP_VERSION >= 5.6.0, please update PHP!, or enable PHPQUERY54 (warning: PHPQuery FOR PHP 5.4 IS EXPERIMENTAL) - current version: '.PHP_VERSION);
 	}
 } else if(version_compare(PHP_VERSION, '5.6.0', '>=')){
 	// traits for php >= 5.6
 	require('compatibility/kernel_56/declare_controller.php');
-	require('compatibility/kernel_56/version.php');
 }
 
 // support __DIR__ concatenation in php 5.4
