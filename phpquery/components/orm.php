@@ -28,6 +28,7 @@ abstract class table
         $this->describe();
         if(!empty($ids))
         {
+        	if(is_array($ids) && count($ids) == 1) $ids = $ids[0];
             if(is_array($this->primaryKeys))
             {
                 if(count($this->primaryKeys) !== count($ids))  _error_::set(eORM3.self::tablename(), LVL_FATAL);
@@ -97,6 +98,7 @@ abstract class table
                 $valuesString .= '?, ';
                 $values[] = $this->$field;
             }
+           
             $valuesString = trim($valuesString, ', ');
 
             $this->lastQuery = array('query' => 'INSERT INTO '.self::tablename().'('.$fields.') VALUES('.$valuesString.')', 'values' => $values);
