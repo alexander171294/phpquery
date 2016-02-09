@@ -1,5 +1,10 @@
 <?php //changelog added validateValues()
 
+if(!defined(PHPQUERY_LOADER)) {
+	include('../index.html');
+	die();
+}
+
 // ORM for php, designed for PDO and phpquery
 define('eORM1', 'eORM1::1 the fields on the model not match with fields in table ');
 define('eORM2', 'eORM2::2 primary key isn\'t defined in the model ');

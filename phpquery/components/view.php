@@ -1,5 +1,10 @@
 <?php
 
+if(!defined(PHPQUERY_LOADER)) {
+	include('../index.html');
+	die();
+}
+
 define('eTPL1', 'eTPL1::1 don\'t exists view ');
 define('eTPL2', 'eTPL2::2 you can\'t name a variable with void string');
 

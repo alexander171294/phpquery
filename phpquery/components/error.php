@@ -1,5 +1,10 @@
 <?php
 
+if(!defined(PHPQUERY_LOADER)) {
+	include('../index.html');
+	die();
+}
+
 // errors levels
 define('LVL_INFO', 10);
 define('LVL_E404', 100);

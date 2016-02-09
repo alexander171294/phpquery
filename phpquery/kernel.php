@@ -1,5 +1,10 @@
 <?php //changes: factory multi PK
 
+if(!defined(PHPQUERY_LOADER)) {
+	include('index.html');
+	die();
+}
+
 session_start();
 
 define('E1', 'The controller hasn\'t is declared ::');
@@ -13,7 +18,6 @@ define('E8', 'Attach_footer, the function isn\'t callable ::');
 define('E9', 'Factory, undefined Primary Key in array source. ::');
 define('E10', 'Factory, the class isn\'t exists. ::');
 define('E11', 'Factory, the array or primary key is null value. ::');
-
 
 class _
 {

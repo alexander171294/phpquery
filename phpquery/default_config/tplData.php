@@ -1,5 +1,10 @@
 <?php
 
+if(!defined(PHPQUERY_LOADER)) {
+	include('../index.html');
+	die();
+}
+
 define('PHPQ_DEFAULT_VIEWS', DIR54.'/../views/');
 define('PHPQ_DEFAULT_CACHE', DIR54.'/cache/');
 

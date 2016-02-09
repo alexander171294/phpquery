@@ -1,4 +1,8 @@
 <?php
+if(!defined(PHPQUERY_LOADER)) {
+	include('../../index.html');
+	die();
+}
 
 function curlGet($link, $timeOut = 3)
 {

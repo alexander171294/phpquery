@@ -1,5 +1,10 @@
 <?php
 
+if(!defined(PHPQUERY_LOADER)) {
+	include('../index.html');
+	die();
+}
+
 class _e
 {
 	static protected $errors = array();

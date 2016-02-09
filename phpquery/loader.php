@@ -1,5 +1,7 @@
 <?php
 
+define('PHPQUERY_LOADER', true);
+
 $version_array = array('version_tag' => '1.0-RC2', 'version_value' => 102);
 require('version.php');
 

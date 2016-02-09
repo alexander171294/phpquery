@@ -1,5 +1,10 @@
 <?php
 
+if(!defined(PHPQUERY_LOADER)) {
+	include('../index.html');
+	die();
+}
+
 class errorData
 {
     static public $die_on_lvl = 75;

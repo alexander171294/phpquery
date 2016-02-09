@@ -1,4 +1,8 @@
 <?php
+if(!defined(PHPQUERY_LOADER)) {
+	include('../../index.html');
+	die();
+}
 
 /** Código BuscadorClass
  *  @ Author: Alexander Eberle <alexander171294@live.com>

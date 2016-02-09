@@ -1,4 +1,8 @@
 <?php
+if(!defined(PHPQUERY_LOADER)) {
+	include('../../index.html');
+	die();
+}
 
 class YouTube
 {
