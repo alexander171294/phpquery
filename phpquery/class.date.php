@@ -1,5 +1,10 @@
 <?php
 
+if(!defined('PHPQUERY_LOADER')) {
+	include('index.html');
+	die();
+}
+
 class _date
 {
     protected $time;
@@ -33,7 +38,7 @@ class _date
     
     public function fMinute($limitter=null)
     {
-        $this->format .= date('I',$this->time).$limitter;
+        $this->format .= date('i',$this->time).$limitter;
         return $this;
     }
     
@@ -45,7 +50,7 @@ class _date
     
     public function fHour($limitter=null)
     {
-        $this->format .= date('h',$this->time).$limitter;
+        $this->format .= date('H',$this->time).$limitter;
         return $this;
     }
     

@@ -1,5 +1,12 @@
 <?php
 
+if(!defined('PHPQUERY_LOADER')) {
+	include('index.html');
+	die();
+}
+
+define('USE_REGEX', 9264);
+
 class objectVar
 {
     private $val = null;
@@ -12,7 +19,7 @@ class objectVar
         $this->real_val = $val;
         $this->no_br = htmlentities($val);
         $this->val = nl2br($this->no_br);
-        $this->toOut = $this->val;
+        $this->toOut = trim($this->val);
     }
     
     public function __toString()
@@ -26,6 +33,18 @@ class objectVar
         $this->toOut = $this->real_val;
         return $this;
     }
+    
+    public function entities()
+    {
+    	$this->toOut = htmlentities($this->toOut);
+    	return $this;
+    }
+	
+	public function entities_decode()
+	{
+		$this->toOut = html_entity_decode($this->toOut);
+    	return $this;
+	}
     
     public function noParseBR()
     {
@@ -65,10 +84,22 @@ class objectVar
         return strlen($this->val);
     }
     
+    public function words()
+    {
+    	$words = explode(' ', $this->val);
+    	$words = array_filter($words);
+    	return count($words);
+    }
+    
     public function isEmail()
     {
         return filter_var($this->val, FILTER_VALIDATE_EMAIL) !== false;
     }
+	
+	public function isLink()
+	{
+		return filter_var($this->val, FILTER_VALIDATE_URL) !== false;
+	}
     
     public function urldecode()
     {

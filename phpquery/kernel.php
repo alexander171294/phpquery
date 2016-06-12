@@ -1,9 +1,9 @@
-<?php
+<?php //changes: factory multi PK
 
-_::set_time();
-
-require('class.date.php');
-require('class.inputvars.php');
+if(!defined('PHPQUERY_LOADER')) {
+	include('index.html');
+	die();
+}
 
 session_start();
 
@@ -13,17 +13,17 @@ define('E3', 'The request action isn\'t exists ::');
 define('E4', 'The function defined on the controller is not callable ::');
 define('E5', 'Declaration of non-existent model ::');
 define('E6', 'Failed to load component ::');
-define('E7', 'define_autocall, the function isn\'t callable ::');
-define('E8', 'attach_footer, the function isn\'t callable ::');
-
-require('default_config/dbData.php');
-
-require('default_config/tplData.php');
-
-require('default_config/coreData.php');
+define('E7', 'Define_autocall, the function isn\'t callable ::');
+define('E8', 'Attach_footer, the function isn\'t callable ::');
+define('E9', 'Factory, undefined Primary Key in array source. ::');
+define('E10', 'Factory, the class isn\'t exists. ::');
+define('E11', 'Factory, the array or primary key is null value. ::');
 
 class _
 {
+	// use compatibility declare_controller function
+	use declare_controller;
+	
     static public $db = null;
     static public $view = null;
     static public $models = null;
@@ -43,6 +43,7 @@ class _
     static protected $footers = array();
     static protected $extras = array();
     static protected $loaded = array();
+	static protected $autocalls = array();
     
     // statics of use
     static protected $time = array();
@@ -71,18 +72,6 @@ class _
         self::$isPost = $_SERVER['REQUEST_METHOD'] == 'POST';
         
         self::load_requires();
-    }
-    
-    static public function declare_controller($file, ...$controllers)
-    {
-        $file = strtolower(trim($file));
-        if(!isset(self::$files[$file]))
-            self::$files[$file] = true;
-        foreach($controllers as $controller)
-        {
-            $controller = strtolower(trim($controller));
-            self::$controllers[$controller] = $file;
-        }
     }
 
     static public function declare_model($file)
@@ -116,17 +105,28 @@ class _
     
     static public function define_autocall($function, $calculate_costs = false)
     {
-        if($calculate_costs && self::$debug) {
-            self::set_time('autocall');
-        }
-        if(is_callable($function))
-        {
-            $function();
-            if($calculate_costs && self::$debug)
-                echo 'COST OF AUTOCALL: '.self::get_cost('autocall');
-        }
-        else _error_::set(E7, LVL_FATAL);
+        self::$autocalls[] = array('f' => $function, 'cc' => $calculate_costs);
     }
+	
+	static public function execute_autocalls()
+	{
+		foreach(self::$autocalls as $autocall)
+		{
+			$calculate_costs = $autocall['cc'];
+			$function = $autocall['f'];
+			if($calculate_costs && self::$debug) {
+				self::set_time('autocall');
+			}
+			if(is_callable($function))
+			{
+				$function();
+				if($calculate_costs && self::$debug)
+					echo 'COST OF AUTOCALL: '.self::get_cost('autocall');
+			}
+			else _error_::set(E7, LVL_FATAL);
+		}
+		
+	}
     
     static public function define_controller($action, $function, $calculate_costs = false)
     {
@@ -136,7 +136,7 @@ class _
         self::$actions[$action] = $function;
     }
     
-    static public function execute($action)
+    static public function execute($action, $loadFooter = true)
     {
     	self::$globals['controller'] = $action;
         if(isset(self::$controllers[$action]))
@@ -154,15 +154,25 @@ class _
                     $call = self::$actions[$action];
                     if(is_callable($call))
                     {
+						// ejecutamos los autocall:
+						self::execute_autocalls();
                         $call();
                         // si exigimos calcular los costos
                         if(self::saved_costs('controller_'.$action) && self::$debug)
                             echo 'COST OF CONTROLLER '.$action.': '.self::get_cost('controller_'.$action);
-                        self::exec_footers();
+						if($loadFooter)
+							self::exec_footers();
                     } else _error_::set(E4.' '.htmlentities($action), LVL_FATAL);
                 } else _error_::set(E3.' '.htmlentities($action), LVL_FATAL);
             } else _error_::set(E2.' '.htmlentities($action), LVL_FATAL);
-        } else _error_::set(E1.' '.htmlentities($action), LVL_WARNING);
+        } else {
+			if(!empty(coreData::$default_404_controller) && $action !== coreData::$default_404_controller)
+			{
+				self::execute(coreData::$default_404_controller);
+			} else {
+				_error_::set(E1.' '.htmlentities($action), LVL_WARNING);
+			}
+		}
     }
     
     // alias of autocall, for backward compatibility reasons.
@@ -180,10 +190,17 @@ class _
         }
     }
     
-    static public function attach_footer($function)
+    static public function attach_footer($function, $onTop = false)
     {
         if(is_callable($function))
-            self::$footers[] = $function;
+        {
+        	if($onTop)
+        	{
+        		array_unshift(self::$footers, $function);
+        	}
+        	else
+        		self::$footers[] = $function;
+        }
         else _error_::set(E8, LVL_FATAL);
     }
     
@@ -281,10 +298,27 @@ class _
     
     static public function factory($array, $pk, $class)
     {
+    	if(!class_exists($class)) _error_::set(E10.' class: '.$class, LVL_FATAL);
+    	if(empty($pk) or !is_array($array)) _error_::set(E11.' pk: '.$pk, LVL_FATAL);
         $out = array();
+        $i = 0;
+        $chkPk = is_array($pk) ? $pk[0] : $pk;
+        	//if(!isset($array[0][$chkPk]))  _error_::set(E9.' class: '.$class.' iteration: Zero', LVL_WARNING);
+        	//else
             foreach($array as $value)
             {
-                $out[] = new $class($value[$pk]);
+            	if(!isset($value[$chkPk]))  _error_::set(E9.' class: '.$class.' iteration:'.$i, LVL_WARNING);
+                if(!is_array($pk))
+            		$out[] = new $class($value[$pk]);
+                else
+                {
+                	$array_constructor = array();
+                	foreach($pk as $ipk){
+                		$array_constructor[] = $value[$ipk];
+                	}
+                	$out[] = new $class($array_constructor);
+                }
+                $i++;
             }
         return $out;
     }
@@ -293,7 +327,7 @@ class _
     {
         if($internal)
         {
-            self::execute($target);
+            return self::execute($target, false);
         } else {
             header('Location: '.$target);
         }
@@ -328,6 +362,20 @@ class _
     {
         $unit=array('b','kb','mb','gb','tb','pb');
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
+    
+    static public function isDebug()
+    {
+    	return self::$debug;
+    }
+    
+    static public function stringify($array)
+    {
+    	$out = array();
+    	foreach($array as $key => $value){
+    		$out[$key] = (string)$value;
+    	}
+    	return $out;
     }
 }
 

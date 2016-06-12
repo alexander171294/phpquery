@@ -1,5 +1,10 @@
 <?php
 
+if(!defined('PHPQUERY_LOADER')) {
+	include('../index.html');
+	die();
+}
+
 class coreData
 {
 	
@@ -9,4 +14,6 @@ class coreData
 	static public $extra = 'extras/';
 	
 	static public $component = '/components/';
+	
+	static public $default_404_controller = null;
 }

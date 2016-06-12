@@ -1,19 +1,40 @@
 <?php
 
+if(!defined('PHPQUERY_LOADER')) {
+	include('../index.html');
+	die();
+}
+
 define('eTPL1', 'eTPL1::1 don\'t exists view ');
 define('eTPL2', 'eTPL2::2 you can\'t name a variable with void string');
+define('eTPL3', 'eTPL1::1 don\'t exists view ({IMPORT=*})');
 
 class template
 {
     protected $includes = array();
     protected $values = array();
     public $isAjax = false;
+	public $onlyThis = false; // solo mostrar ultimo $view->show();
     
     
     public function show($file)
     {
-        if(!file_exists(tplData::$folder.$file.tplData::$extension)) _error_::set(eTPL1.$file.tplData::$extension, LVL_FATAL);
-        else $this->includes[] = array('source' => tplData::$folder.$file.tplData::$extension, 'filename' => $file);
+        if(!file_exists(tplData::getFolder().$file.tplData::$extension)) _error_::set(eTPL1.$file.tplData::$extension, LVL_FATAL);
+        else {
+			if($this->onlyThis)
+			{
+				$this->includes = array(array('source' => tplData::getFolder().$file.tplData::$extension, 'filename' => $file));
+				$this->execute();
+			} else {
+				$this->includes[] = array('source' => tplData::getFolder().$file.tplData::$extension, 'filename' => $file);
+			}
+		}
+    }
+	
+	public function import($file)
+    {
+        if(!file_exists(tplData::getFolder().$file.tplData::$extension)) _error_::set(eTPL3.$file.tplData::$extension, LVL_FATAL);
+        else $this->forceLoad(array('source' => tplData::getFolder().$file.tplData::$extension, 'filename' => $file));
     }
     
     public function assign($var, $content)
@@ -54,6 +75,19 @@ class template
         
         return true;
     }
+	
+	public function forceLoad($include){
+		$_ = $this->values;
+        extract($_); //this replace all .h
+		$forceReWork = false;
+        if(!tplData::$cache)
+            $forceReWork = true;
+        if(DEVMODE)
+            $forceReWork = true;
+		if(!file_exists(tplData::$cacheDir.$include['filename'].'.tmp') or $forceReWork)
+			$this->reWork($include);
+		include(tplData::$cacheDir.$include['filename'].'.tmp');
+	}
     
     public function reWork($fileData)
     {
@@ -102,6 +136,11 @@ class template
         $regex = '/\{dump=([^\}]*)\}/';
         $regex2 = '<?=var_dump($1);?>';
         $source = preg_replace($regex, $regex2, $source);
+		
+		// htmlimport
+		$regex = '/\{import=([^\}]*)\}/';
+        $regex2 = '<?php _::$view->import(\'$1\'); ?>';
+        $source = preg_replace($regex, $regex2, $source);
         
         // primero procesamos las variables
         $regex = '/\{\$([^\}]*)\}/';
@@ -113,8 +152,8 @@ class template
         $regex2 = '<?=$1;?>';
         $source = preg_replace($regex, $regex2, $source);
         
-        $source = str_replace('{url}','http://'.$_SERVER['HTTP_HOST'], $source);
-        $source = str_replace('{url:full}','http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $source);
+        $source = str_replace('{url}','<?=$view_url_frk_core;?>', $source);
+        $source = str_replace('{url:full}','<?=$view_url_frk_core_full;?>', $source);
         
         // ahora las globales
         $regex = '/\{\%([a-zA-Z0-9_]*)\%\}/';
@@ -124,15 +163,63 @@ class template
         return $source;
     }
     
+    protected function isSSL()
+    {
+    	return ($_SERVER['SERVER_PORT']  == 443) || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on');
+    }
+    
     public function loadCache()
     {
         $_ = $this->values;
         extract($_); //this replace all .h
+        
+        $https = $this->isSSL();
+        $view_url_frk_core = 'http'.($https ? 's' : null).'://'.$_SERVER['HTTP_HOST'];
+        $view_url_frk_core_full = 'http'.($https ? 's' : null).'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
         foreach($this->includes as $include)
         {
             include(tplData::$cacheDir.$include['filename'].'.tmp');
         }
     }
+    
+    public function clearCache()
+    {
+    	$dir = $this->dirToArray(tplData::$cacheDir);
+    	$this->clear_dir_recursive($dir, tplData::$cacheDir);
+    }
+    
+    protected function dirToArray($dir)
+    {
+		$result = array();
+		$cdir = scandir($dir);
+		foreach ($cdir as $key => $value)
+		{
+			if (!in_array($value,array('.','..')))
+			{
+				if (is_dir($dir . DIRECTORY_SEPARATOR . $value))
+				{
+					$result[$value] = $this->dirToArray($dir . DIRECTORY_SEPARATOR . $value);
+				}
+				else
+				{
+					$result[] = $value;
+				}
+			}
+		}
+		return $result;
+	}
+	
+	protected function clear_dir_recursive($dir, $basedir)
+	{
+		foreach($dir as $key => $target)
+		{
+			// es una carpeta
+			if(is_array($target))
+				$this->clear_dir_recursive($target, $basedir.$key.'/');
+			else // es un archivo
+				unlink($basedir.$target);
+		}
+	}
 }
 
 

@@ -1,9 +1,15 @@
-<?php
+<?php //changelog added validateValues()
+
+if(!defined('PHPQUERY_LOADER')) {
+	include('../index.html');
+	die();
+}
 
 // ORM for php, designed for PDO and phpquery
 define('eORM1', 'eORM1::1 the fields on the model not match with fields in table ');
 define('eORM2', 'eORM2::2 primary key isn\'t defined in the model ');
 define('eORM3', 'eORM3::3 primary keys don\'t match in instantiation of table ');
+define('eORM4', 'eORM3::4 !attempt to save a property of type ');
 
 abstract class table
 {
@@ -19,6 +25,9 @@ abstract class table
     
     public $lastQuery = null;
     public $lastError = null;
+    public $void = false;
+	
+	static protected $randTable = array();
     
     public function __construct($ids = null)
     {
@@ -26,6 +35,7 @@ abstract class table
         $this->describe();
         if(!empty($ids))
         {
+        	if(is_array($ids) && count($ids) == 1) $ids = $ids[0];
             if(is_array($this->primaryKeys))
             {
                 if(count($this->primaryKeys) !== count($ids))  _error_::set(eORM3.self::tablename(), LVL_FATAL);
@@ -57,7 +67,7 @@ abstract class table
         }
     }
     
-    public function populate($where)
+    public function populate($where, $preserve = false)
     {
         $attach = ' WHERE ';
         $params = array();
@@ -69,17 +79,21 @@ abstract class table
         $attach = rtrim($attach, 'AND ');
         $this->individualWhereClausule = $attach;
         $this->iwc_values = $params;
+        if($preserve) $oldQ = $this->lastQuery;
         $this->lastQuery = array('query' => 'SELECT * FROM '.self::tablename().$attach.' LIMIT 1', 'values' => $params);
-        $query = $this->makeQuery();
+        $query = $this->makeQuery(!$preserve);
+        if($preserve) $this->lastQuery = $oldQ;
         $values = $query->fetch(PDO::FETCH_ASSOC);
         if(is_array($values))
+        {
             foreach($values as $key => $value)
             {
                 $this->$key = $value;
             }
+        } else $this->void = true;
     }
     
-    public function save()
+    public function save($showPopulateError = false)
     {
         if($this->new)
         { // insert
@@ -91,6 +105,7 @@ abstract class table
                 $valuesString .= '?, ';
                 $values[] = $this->$field;
             }
+           
             $valuesString = trim($valuesString, ', ');
 
             $this->lastQuery = array('query' => 'INSERT INTO '.self::tablename().'('.$fields.') VALUES('.$valuesString.')', 'values' => $values);
@@ -107,7 +122,8 @@ abstract class table
             	$pk = $this->primaryKeys[0];
             	$this->$pk = $id;
             }
-            $this->populate(array($pk => $id));
+            
+            $this->populate(array($pk => $id), !$showPopulateError);
             
             return $id;
         } else { // update
@@ -127,12 +143,32 @@ abstract class table
         }
     }
     
-    private function makeQuery()
+    private function makeQuery($saveError = true)
     {
         $q = self::$pdo->prepare($this->lastQuery['query']);
+        $this->validateValues();
         $q->execute($this->lastQuery['values']);
-        $this->lastError = $q->errorInfo();
+        if($saveError)
+        	$this->lastError = $q->errorInfo();
         return $q;
+    }
+    
+    private function validateValues()
+    {
+    	foreach($this->lastQuery['values'] as $key => $valueGroup)
+    	{
+    		if(is_object($valueGroup))
+    			_error_::set(eORM4.'OBJECT in table '.self::tablename().' field '.$this->fields[$key], LVL_FATAL);
+    		if(is_resource($valueGroup))
+    			_error_::set(eORM4.'RESOURCE in table '.self::tablename().' field '.$this->fields[$key], LVL_FATAL);
+    		if(is_link($valueGroup))
+    			_error_::set(eORM4.'LINK in table '.self::tablename().' field '.$this->fields[$key], LVL_FATAL);
+    		if(is_array($valueGroup))
+    		{
+    				_error_::set(eORM4.'ARRAY in table '.self::tablename().', then is transformed to JSON - field '.$this->fields[$key], LVL_WARNING);
+    				$this->lastQuery['values'][$key] = json_encode($this->lastQuery['values'][$key]);
+    		}
+    	}
     }
     
     public function delete()
@@ -148,15 +184,73 @@ abstract class table
     
     static public function tablename()
     {
-        return ltrim(get_called_class(),'table_');
+        return str_replace('table_',null,get_called_class());
     }
     
-    static public function getAll($adding = null, $style = PDO::FETCH_ASSOC)
+    static public function getAll($adding = null, $arrayExec = array(), $style = PDO::FETCH_ASSOC)
     {
-        if(!empty($adding)) $adding = ' '.$adding;
+        if(!empty($adding)) $adding = ' '.trim($adding);
         $q = _::$db->prepare('SELECT * FROM '.self::tablename().$adding);
-        $q->execute();
+        $q->execute($arrayExec);
         return $q->fetchAll($style);
+    }
+	
+	static public function getAllObjects($primarykeys, $adding = null, $arrayExec = array())
+	{
+		$array = self::getAll($adding, $arrayExec);
+		return _::factory($array, $primarykeys, self::tablename());
+	}
+    
+    static public function getUnique($adding = null, $arrayExec = array(), $style = PDO::FETCH_ASSOC)
+    {
+    	if(!empty($adding)) $adding = ' '.trim($adding);
+    	$q = _::$db->prepare('SELECT * FROM '.self::tablename().$adding);
+    	$q->execute($arrayExec);
+    	return $q->fetch($style);
+    }
+	
+	static public function count($pk, $adding = null, $arrayExec = array())
+	{
+		if(!empty($adding)) $adding = ' '.trim($adding);
+        $q = _::$db->prepare('SELECT count('.$pk.') as total FROM '.self::tablename().$adding);
+		$q->execute($arrayExec);
+		return $q->fetch(PDO::FETCH_ASSOC)['total'];
+	}
+	
+	static public function getRand($pk, $whereSection = null, $cantidad = 1, $noRepeat = false)
+	{
+		$records = self::count($pk, $whereSection);
+		$out = null;
+		for($i=0; $i<$cantidad; $i++)
+        {
+			$aleatorio = rand(0, $records-1);
+			if($cantidad > 1)
+			{
+				$toOut = self::getUnique($whereSection.' LIMIT '.$aleatorio.', 1');
+				if(!$noRepeat){
+					$out[] = $toOut;
+				} elseif($cantidad < $records) {
+					if(in_array($toOut[$pk], self::$randTable))
+						$out[] = self::getRand($pk, $whereSection, $cantidad, true);
+					else
+					{
+						$out[] = $toOut;
+						self::$randTable[] = $toOut[$pk];
+					}
+				}
+			}
+			else return self::getUnique($whereSection.' LIMIT '.$aleatorio.', 1');
+        }
+		self::$randTable = array();
+		return $out;
+	}
+	
+	static public function deleteAll($adding = null, $arrayExec = array())
+    {
+        if(!empty($adding)) $adding = ' '.trim($adding);
+        $q = _::$db->prepare('DELETE FROM '.self::tablename().$adding);
+        $q->execute($arrayExec);
+        return true;
     }
 }
 
