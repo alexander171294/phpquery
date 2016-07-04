@@ -197,8 +197,7 @@ abstract class table
 	
 	static public function getAllObjects($primarykeys, $adding = null, $arrayExec = array())
 	{
-		$array = self::getAll($adding, $arrayExec);
-		return _::factory($array, $primarykeys, self::tablename());
+		return _::factory(self::getAll($adding, $arrayExec), $primarykeys, self::tablename());
 	}
     
     static public function getUnique($adding = null, $arrayExec = array(), $style = PDO::FETCH_ASSOC)
@@ -209,6 +208,23 @@ abstract class table
     	return $q->fetch($style);
     }
 	
+	static public function getUniqueObject($primaryKeys, $adding = null, $arrayExec = array())
+	{
+		$tableName = self::tablename();
+		$unique = self::getUnique($adding, $arrayExect);
+		if(!is_array($primaryKeys))
+			return new $tableName($unique[$primaryKeys]);
+		else
+		{
+			$out = array();
+			foreach($primaryKeys as $pk)
+			{
+				$out[] = $unique[$pk];
+			}
+			return new $tableName($out);
+		}
+	}
+	
 	static public function count($pk, $adding = null, $arrayExec = array())
 	{
 		if(!empty($adding)) $adding = ' '.trim($adding);
@@ -217,7 +233,7 @@ abstract class table
 		return $q->fetch(PDO::FETCH_ASSOC)['total'];
 	}
 	
-	static public function getRand($pk, $whereSection = null, $cantidad = 1, $noRepeat = false)
+	static public function getRand($pk, $whereSection = null, $cantidad = 1)
 	{
 		$records = self::count($pk, $whereSection);
 		$out = null;
@@ -227,22 +243,17 @@ abstract class table
 			if($cantidad > 1)
 			{
 				$toOut = self::getUnique($whereSection.' LIMIT '.$aleatorio.', 1');
-				if(!$noRepeat){
-					$out[] = $toOut;
-				} elseif($cantidad < $records) {
-					if(in_array($toOut[$pk], self::$randTable))
-						$out[] = self::getRand($pk, $whereSection, $cantidad, true);
-					else
-					{
-						$out[] = $toOut;
-						self::$randTable[] = $toOut[$pk];
-					}
-				}
+				$out[] = $toOut;
 			}
 			else return self::getUnique($whereSection.' LIMIT '.$aleatorio.', 1');
         }
 		self::$randTable = array();
 		return $out;
+	}
+	
+	static public function getRandObjects($pk, $whereSection = null, $cantidad = 1)
+	{
+		return _::factory(self::getRand($pk, $whereSection, $cantidad), $pk, self::tablename());
 	}
 	
 	static public function deleteAll($adding = null, $arrayExec = array())

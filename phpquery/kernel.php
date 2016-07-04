@@ -43,7 +43,6 @@ class _
     static protected $footers = array();
     static protected $extras = array();
     static protected $loaded = array();
-	static protected $autocalls = array();
     
     // statics of use
     static protected $time = array();
@@ -105,28 +104,17 @@ class _
     
     static public function define_autocall($function, $calculate_costs = false)
     {
-        self::$autocalls[] = array('f' => $function, 'cc' => $calculate_costs);
+        if($calculate_costs && self::$debug) {
+            self::set_time('autocall');
+        }
+        if(is_callable($function))
+        {
+            $function();
+            if($calculate_costs && self::$debug)
+                echo 'COST OF AUTOCALL: '.self::get_cost('autocall');
+        }
+        else _error_::set(E7, LVL_FATAL);
     }
-	
-	static public function execute_autocalls()
-	{
-		foreach(self::$autocalls as $autocall)
-		{
-			$calculate_costs = $autocall['cc'];
-			$function = $autocall['f'];
-			if($calculate_costs && self::$debug) {
-				self::set_time('autocall');
-			}
-			if(is_callable($function))
-			{
-				$function();
-				if($calculate_costs && self::$debug)
-					echo 'COST OF AUTOCALL: '.self::get_cost('autocall');
-			}
-			else _error_::set(E7, LVL_FATAL);
-		}
-		
-	}
     
     static public function define_controller($action, $function, $calculate_costs = false)
     {
@@ -154,8 +142,6 @@ class _
                     $call = self::$actions[$action];
                     if(is_callable($call))
                     {
-						// ejecutamos los autocall:
-						self::execute_autocalls();
                         $call();
                         // si exigimos calcular los costos
                         if(self::saved_costs('controller_'.$action) && self::$debug)

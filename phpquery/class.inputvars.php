@@ -5,8 +5,6 @@ if(!defined('PHPQUERY_LOADER')) {
 	die();
 }
 
-define('USE_REGEX', 9264);
-
 class objectVar
 {
     private $val = null;
@@ -145,7 +143,10 @@ class objectVar
     public function seo()
     {
         // Tranformamos todo a minusculas
-        $url = $this->toOut;
+		$val = $this->real_val;
+		$regex = '/\&([a-zA-Z]?)acute;/';
+        $val = preg_replace($regex,'$1', $val);
+        $url = html_entity_decode($val);
         $url = strtolower($url);
              
         //Rememplazamos caracteres especiales latinos

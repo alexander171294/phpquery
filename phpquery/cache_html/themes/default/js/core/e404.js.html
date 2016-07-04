@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="icon" href="http://localhost/themes/default/favicon.ico">
+    <link rel="shortcut icon" href="http://localhost/themes/default/favicon.ico" type="image/x-icon" />
+    
+        
+    <title>Linkeros! - Todas tus descargas</title>
+    <meta name="description" content="Web de descargas, links, mega">
+    <meta name="author" content="<br />
+<b>Notice</b>:  Undefined index: author in <b>/var/www/html/phpquery/cache/header.tmp</b> on line <b>35</b><br />
+">
+    
+    <meta property="og:site_name" content="Linkeros!">
+    <meta property="og:url" content="http://localhost">
+    <meta property="og:title" content="Linkeros! - Todas tus descargas">
+    <meta property="og:description" content="Web de descargas, links, mega">
+    
+    <meta name="DC.title" content="Linkeros!" />
+    <meta name="DC.description" content="Web de descargas, links, mega">
+    <meta name="DC.language" content="es">
+    <meta name="DC.creator" content="<br />
+<b>Notice</b>:  Undefined index: author in <b>/var/www/html/phpquery/cache/header.tmp</b> on line <b>45</b><br />
+">
+    
+    
+          <meta name="robots" content="noindex,follow">
+            
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="container" id="main_box">
+        <div id="border_top"></div>
+        <a href="/"><div id="main_logo"></div></a>
+        <div id="menu_principal">
+            <ul class="menu_izquierdo">
+                <li class="active"><a href="/">Posts <img src="http://localhost/themes/default/images/arrowdown.png"></a></li>
+                <!--<li ><a href="/catalogos">Catálogos <img src="http://localhost/themes/default/images/arrowdown.png"></a></li>-->
+                <li ><a href="/tops">TOPs <img src="http://localhost/themes/default/images/arrowdown.png"></a></li>
+                <li ><a href="/buscador">Buscador <img src="http://localhost/themes/default/images/arrowdown.png"></a></li>
+                <!--<li ><a href="/adults" style="color:#C70000">+18 <img src="http://localhost/themes/default/images/arrowdown.png"></a></li>-->
+                <!--<li ><a href="/test_area" style="color: #BB10AE;">VIP <img src="http://localhost/themes/default/images/arrowdown.png"></a></li>-->
+                <!--<li ><a href="/control">Ejecutor <img src="http://localhost/themes/default/images/arrowdown.png"></a></li>-->
+                                <li><a href="/control" style="color: #8E4418;">Control <img src="http://localhost/themes/default/images/arrowdown.png"></a></li>            </ul>
+            <ul class="menu_derecho">
+                              <li><a href="#" id="barbtn_logout"><i class="icon logout"></i></a></li>
+                <li><a href="/usuario/1/vladimir" class="profiletext">vladimir</a></li>
+                <li><a href="/account"><i class="icon editprofile"></i></a></li>
+                <li class="locked"><a href="#"><i class="icon draft"></i></a></li>
+                <li class="locked"><a href="#"><i class="icon favoritos"></i></a></li>
+                <li><a href="/mensajes"><i class="icon msg"></i></a> </li>
+                <li id="barbtn_notify" ><a href="#"><i class="icon seguidores"></i></a> </li>
+                          </ul>
+            
+        </div>
+        <div id="notifybox" class="hide">
+                    <h4>Notificaciones</h4>
+                    <ul class="uNotifyList">
+                      <!--
+                      <li><i class="icon seguir"></i> <a href="#">Alexander171294</a> te está siguiendo</li>
+                      <li><i class="icon favoritos"></i> <a href="#">Alexander171294</a> agregó a favoritos tu <a href="#">post</a></li>
+                      <li><i class="icon working"></i> <a href="#">Alexander171294</a> eliminó tu comentario <a href="#">aquí</a></li>
+                      <li><i class="icon comentarios"></i> <a href="#">Alexander171294</a> comentó tu <a href="#">post</a></li>
+                      <li><i class="icon comentarios"></i> <a href="#">Alexander171294</a> comentó un <a href="#">post</a> que sigues</li>
+                      <li><i class="icon draft"></i> <a href="#">Alexander171294</a> creó un <a href="#">post</a></li>
+                      <li><i class="icon working"></i> tu <a href="#">post</a> fué pegado</li>
+                      <li><i class="icon working"></i> tu <a href="#">post</a> fué eliminado</li>
+                      <li><i class="icon puntos"></i> <a href="#">Alexander171294</a> puntuó <a href="#">post</a></li>
+                      -->
+                    </ul>
+                    <div class="bottom"><a href="#" style="color:grey;">Ver más notificaciones.</a></div>
+        </div>
+                    <div id="menu_secondary">
+                <ul class="nav nav-tabs">
+                    <li role="presentation" ><a href="/">Inicio</a></li>
+                    <li role="presentation" ><a href="/novatos">Novatos</a></li>                    <li role="presentation" ><a href="#">Destacados</a></li>
+                    <li role="presentation"><a href="/agregar">Agregar post</a></li>                    <div id="seleccionar_categoria">
+                        <span>Filtrar por categorías:</span>
+                        <select id="catSelectorMain">
+                          <option value="-1">Seleccionar categoria...</option>
+                                                        <option class="catl2 videos" value="36" data-id="36" data-seo="videos-online">Videos online</option>
+                                                        <option class="catl2 tvpeliculasyseries" value="35" data-id="35" data-seo="tv-peliculas-series">TV, Peliculas, Series</option>
+                                                        <option class="catl2 tutoriales" value="34" data-id="34" data-seo="tutoriales">Tutoriales</option>
+                                                        <option class="catl2 turismo" value="33" data-id="33" data-seo="turismo">Turismo</option>
+                                                        <option class="catl2 solidaridad" value="32" data-id="32" data-seo="soliradidad">Soliradidad</option>
+                                                        <option class="catl2 saludybienestar" value="31" data-id="31" data-seo="salud-y-bienestar">Salud y bienestar</option>
+                                                        <option class="catl2 reviews" value="30" data-id="30" data-seo="reviews">Reviews</option>
+                                                        <option class="catl2 recetas" value="29" data-id="29" data-seo="recetas-y-cocina">Recetas y cocina</option>
+                                                        <option class="catl2 paranormal" value="28" data-id="28" data-seo="paranormal">Paranormal</option>
+                                                        <option class="catl2 offtopic" value="27" data-id="27" data-seo="offtopic">Offtopic</option>
+                                                        <option class="catl2 noticias" value="26" data-id="26" data-seo="noticias">Noticias</option>
+                                                        <option class="catl2 negociosyeconomia" value="25" data-id="25" data-seo="negocios-y-econom-iacutea">Negocios y econom&iacute
+a</option>
+                                                        <option class="catl2 monografias" value="24" data-id="24" data-seo="monograf-iacutes">Monograf&iacute
+s</option>
+                                                        <option class="catl2 mascotas" value="23" data-id="23" data-seo="mascotas">Mascotas</option>
+                                                        <option class="catl2 mangayanime" value="22" data-id="22" data-seo="manga-y-anime">Manga y anime</option>
+                                                        <option class="catl2 mac" value="21" data-id="21" data-seo="mac">Mac</option>
+                                                        <option class="catl2 musica" value="20" data-id="20" data-seo="m-uacutesica">M&uacute
+sica</option>
+                                                        <option class="catl2 linux" value="19" data-id="19" data-seo="linux">Linux</option>
+                                                        <option class="catl2 links" value="10" data-id="10" data-seo="links">Links</option>
+                                                        <option class="catl2 linkeros" value="37" data-id="37" data-seo="linkeros">Linkeros</option>
+                                                        <option class="catl2 juegosonline" value="18" data-id="18" data-seo="juegos-online">Juegos online</option>
+                                                        <option class="catl2 juegos" value="17" data-id="17" data-seo="juegos">Juegos</option>
+                                                        <option class="catl2 info" value="16" data-id="16" data-seo="informaci-oacuten">Informaci&oacute
+n</option>
+                                                        <option class="catl2 humor" value="15" data-id="15" data-seo="humor">Humor</option>
+                                                        <option class="catl2 gay" value="14" data-id="14" data-seo="homosexual">Homosexual</option>
+                                                        <option class="catl2 doityourself" value="13" data-id="13" data-seo="hazlo-t-uacutemismo">Hazlo t&uacute
+mismo</option>
+                                                        <option class="catl2 imagenes" value="12" data-id="12" data-seo="fotos-e-imagenes">Fotos e imagenes</option>
+                                                        <option class="catl2 femme" value="11" data-id="11" data-seo="femenino">Femenino</option>
+                                                        <option class="catl2 ecologia" value="9" data-id="9" data-seo="ecolog-iacutea">Ecolog&iacute
+a</option>
+                                                        <option class="catl2 descargas" value="8" data-id="8" data-seo="descargas">Descargas</option>
+                                                        <option class="catl2 deportes" value="7" data-id="7" data-seo="deportes">Deportes</option>
+                                                        <option class="catl2 comics" value="4" data-id="4" data-seo="comics">Comics</option>
+                                                        <option class="catl2 cienciayeducacion" value="6" data-id="6" data-seo="ciencia-y-educaci-oacuten">Ciencia y educaci&oacute
+
+n</option>
+                                                        <option class="catl2 celulares" value="5" data-id="5" data-seo="celulares">Celulares</option>
+                                                        <option class="catl2 autosymotos" value="3" data-id="3" data-seo="autos-y-motos">Autos y motos</option>
+                                                        <option class="catl2 arte" value="2" data-id="2" data-seo="arte">Arte</option>
+                                                        <option class="catl2 flash" value="1" data-id="1" data-seo="animaciones">Animaciones</option>
+                                                  </select>
+                    </div>                </ul>
+            </div>
+                                
+                <div id="main_content" ><div class="row">
+    <div class="col-md-6">
+        <h1 class="redy">Oops! No encontramos lo que buscabas!</h1>
+        <span class="e_content">Es probable que el enlace que seguiste para llegar aquí sea erroneo.</span><br />
+    </div>
+    <div class="col-md-6" style="text-align: center;">
+        <img src="http://localhost/themes/default//images/404.gif" />
+    </div>
+</div>
+            </div>
+        <div id="footer_links"><a href="/terms">Terminos del servicio</a> - <a href="/protocolo">Protocolo</a> - <a href="/agradecimientos">Agradecimientos</a> - <a href="/config">Configuraciones</a></div>
+        <div id="note_version"><a href="/version">Notas de la versión</a></div>        <div id="border_bot"></div>
+    </div>
+    <div id="copy_link">Linkeros! &copy; 2016 - Powered by <b>Linkeros 1.0.7 [Beta] - Started 24/06/16 23:38</b></div>
+    
+    <!-- Bootstrap core CSS -->
+    <link href="http://localhost/themes/default/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="http://localhost/themes/default/css/taringa-v4.css" rel="stylesheet">
+    <!-- icons -->
+    <link href="http://localhost/themes/default/css/icons.css" rel="stylesheet">
+    <!-- ranks -->
+    <link href="http://localhost/themes/default/css/ranks.css" rel="stylesheet">
+    <!-- Category Icon List -->
+    <link href="http://localhost/themes/default/css/catlist.css" rel="stylesheet">
+    <!-- emoticonos -->
+    <link href="http://localhost/themes/default/css/emoticonos.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster r-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://localhost/themes/default/js/bootstrap.min.js"></script>
+    <!-- MODAL -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="/constjs"></script>
+    <script src="http://localhost/themes/default/js/core/varios.js"></script>
+    <script src="http://localhost/themes/default/js/core/miniEditor.js"></script>
+    <!-- Without login -->
+    <div class="cortina hide"></div>
+    
+            <script src="http://localhost/themes/default/js/core/buscadorHome.js"></script>
+                    <!-- modal Alert -->
+    <div class="modalContent hide" id="modalAlert">
+      <div class="col-md-4 col-md-offset-4">
+        <div class="panel panel-registro" id="panel-modalAlert">
+            <div class="panel-heading"><i id="alertTitle">??</i> <span class="icon closereg right closeModal" data-modal="modalAlert"></span></div>
+            <!-- primera instancia del registro -->
+            <div class="panel-body">
+                    <div id="alertContent">
+                      
+                    </div>
+                    <div class="separator"></div>
+                    <button type="button" class="btn btn-verde" id="alert_terminar">Entendido</button>
+            </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modalContent hide" id="modalConfirm">
+      <div class="col-md-4 col-md-offset-4">
+        <div class="panel panel-registro" id="panel-modalConfirm">
+            <div class="panel-heading"><i id="confirmTitle">??</i> <span class="icon closereg right closeModal" data-modal="modalConfirm"></span></div>
+            <!-- primera instancia del registro -->
+            <div class="panel-body">
+                    <div id="confirmContent">
+                      
+                    </div>
+                    <div class="separator"></div>
+                    <button type="button" class="btn btn-verde" style="display: inline-block;" id="confirm_yes">Si</button>
+                    <button type="button" class="btn btn-gris" style="display: inline-block;" id="confirm_no">No</button>
+            </div>
+        </div>
+      </div>
+    </div>            <!-- modal Alert -->
+    <div class="modalContent hide" id="modalMP">
+      <div class="col-md-4 col-md-offset-4">
+        <div class="panel panel-registro" id="panel-modalMP">
+            <div class="panel-heading"><i id="alertTitle">Enviar mensaje privado</i> <span class="icon closereg right closeModal" data-modal="modalMP"></span></div>
+            <!-- primera instancia del registro -->
+            <div class="panel-body">
+                    <div class="alert alert-success hide" role="alert" id="mp_sended">Mensaje enviado</div>
+                    <div id="panelmpContent">
+                      <div class="alert alert-danger hide" role="alert" id="mp_error">...</div>
+                        <label>Para:</label>
+                        <input type="text" name="nick" id="mp_nick" style="width: 50%;" /><i class="icon spinner hide" id="mp_nick_spinner" style="margin-left: -25px;margin-right: 10px;margin-bottom: 3px;"></i> <div class="mpAclare">(ingrese el nick del usuario)</div>
+                      <p>
+                        <label>Asunto:</label>
+                        <input type="text" name="asunto" id="mp_asunto"/>
+                      </p>
+                      <p>
+                        <label>Mensaje:</label>
+                        <textarea name="mensaje" id="mp_mensaje"></textarea>
+                      </p>
+                    </div>
+                    <div class="separator" style="border-top: 1px dashed gray;"></div>
+                    <button type="button" class="btn btn-verde" id="mp_enviar" style="display: inline-block">Enviar</button>
+                    <button type="button" class="btn btn-gris" id="mp_cancelar" style="display: inline-block">Cancelar</button>
+            </div>
+        </div>
+      </div>
+    </div>        <div class="modalContent hide" id="modalReport">
+      <div class="col-md-4 col-md-offset-4">
+        <div class="panel panel-registro" id="panel-modalReport">
+            <div class="panel-heading"><i id="alertTitle">Denunciar</i> <span class="icon closereg right closeModal" data-modal="modalReport"></span></div>
+            <!-- primera instancia del registro -->
+            <div class="panel-body">
+                    <div id="reportContent">
+                      <div class="alert alert-danger hide" role="alert" id="reportError">Gracias por reportar el post</div>
+                      <div class="row" style="text-align: center; margin-bottom: 10px;">
+                        <b>Denunciar el post:</b><br />
+                        <span id="report_nombre_post"><br />
+<b>Notice</b>:  Undefined variable: post in <b>/var/www/html/phpquery/cache/otros/report.tmp</b> on line <b>11</b><br />
+<br />
+<b>Notice</b>:  Trying to get property of non-object in <b>/var/www/html/phpquery/cache/otros/report.tmp</b> on line <b>11</b><br />
+</span>
+                      </div>
+                      <div class="row" style="text-align: center; margin-bottom: 10px;">
+                        <b>Creado por:</b><br />
+                        <span id="report_author_post"><br />
+<b>Notice</b>:  Undefined variable: autor in <b>/var/www/html/phpquery/cache/otros/report.tmp</b> on line <b>15</b><br />
+<br />
+<b>Notice</b>:  Trying to get property of non-object in <b>/var/www/html/phpquery/cache/otros/report.tmp</b> on line <b>15</b><br />
+</span>
+                      </div>
+                      <div class="row" style="text-align: center; margin-bottom: 10px;">
+                        <b>Razon de la denuncia:</b><br />
+                        <select id="report_razon" style="width: 50%">
+                              <br />
+<b>Notice</b>:  Undefined variable: reportes in <b>/var/www/html/phpquery/cache/otros/report.tmp</b> on line <b>20</b><br />
+<br />
+<b>Warning</b>:  Invalid argument supplied for foreach() in <b>/var/www/html/phpquery/cache/otros/report.tmp</b> on line <b>20</b><br />
+                        </select>
+                      </div>
+                      <div class="row" style="text-align: center; margin-bottom: 10px;">
+                        <b>Aclaración y comentarios:</b><br />
+                        <textarea id="report_aclaracion" style="width: 90%;height: 100px;margin-top: 3px;"></textarea><br />
+                        <span style="font-size: 11px;">En caso de ser Re-post se debe indicar el link del post original</span>
+                      </div>
+                      
+                    </div>
+                    <div class="hide" id="reportThanks">
+                        <div class="alert alert-success" role="alert">Gracias por reportar el post</div>
+                    </div>
+                    <div class="separator"></div>
+                  <div class="row" style="text-align: center;" id="reportButtons">
+                        <button type="button" class="btn btn-verde" style="display: inline-block;" id="report_terminar">Denunciar</button>
+                        <button type="button" class="btn btn-gris closeModal" data-modal="modalReport" style="display: inline-block;">Cancelar</button>
+                  </div>
+            </div>
+        </div>
+      </div>
+    </div>        <script src="http://localhost/themes/default/js/core/mp.js"></script>
+        <script src="http://localhost/themes/default/js/core/moderate.js"></script>
+        <script src="http://localhost/themes/default/js/core/comments.js"></script>
+                <script src="http://localhost/themes/default/js/core/e404.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                <!-- modal Alert -->
+    <div class="modalContent hide" id="modalAlert">
+      <div class="col-md-4 col-md-offset-4">
+        <div class="panel panel-registro" id="panel-modalAlert">
+            <div class="panel-heading"><i id="alertTitle">??</i> <span class="icon closereg right closeModal" data-modal="modalAlert"></span></div>
+            <!-- primera instancia del registro -->
+            <div class="panel-body">
+                    <div id="alertContent">
+                      
+                    </div>
+                    <div class="separator"></div>
+                    <button type="button" class="btn btn-verde" id="alert_terminar">Entendido</button>
+            </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modalContent hide" id="modalConfirm">
+      <div class="col-md-4 col-md-offset-4">
+        <div class="panel panel-registro" id="panel-modalConfirm">
+            <div class="panel-heading"><i id="confirmTitle">??</i> <span class="icon closereg right closeModal" data-modal="modalConfirm"></span></div>
+            <!-- primera instancia del registro -->
+            <div class="panel-body">
+                    <div id="confirmContent">
+                      
+                    </div>
+                    <div class="separator"></div>
+                    <button type="button" class="btn btn-verde" style="display: inline-block;" id="confirm_yes">Si</button>
+                    <button type="button" class="btn btn-gris" style="display: inline-block;" id="confirm_no">No</button>
+            </div>
+        </div>
+      </div>
+    </div>    <!-- Without login -->
+  </body>
+</html>

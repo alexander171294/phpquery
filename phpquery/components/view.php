@@ -14,21 +14,12 @@ class template
     protected $includes = array();
     protected $values = array();
     public $isAjax = false;
-	public $onlyThis = false; // solo mostrar ultimo $view->show();
     
     
     public function show($file)
     {
         if(!file_exists(tplData::getFolder().$file.tplData::$extension)) _error_::set(eTPL1.$file.tplData::$extension, LVL_FATAL);
-        else {
-			if($this->onlyThis)
-			{
-				$this->includes = array(array('source' => tplData::getFolder().$file.tplData::$extension, 'filename' => $file));
-				$this->execute();
-			} else {
-				$this->includes[] = array('source' => tplData::getFolder().$file.tplData::$extension, 'filename' => $file);
-			}
-		}
+        else $this->includes[] = array('source' => tplData::getFolder().$file.tplData::$extension, 'filename' => $file);
     }
 	
 	public function import($file)
