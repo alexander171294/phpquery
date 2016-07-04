@@ -2,18 +2,18 @@
 
 ## Actual version:
 
-In develop: 1.0-RC2
+Last released version: 1.0 Final 07/04/2016 [final]
 
-Released version: 1.0-RC1
+## Documentation:
 
-Next version is published 20/12/15 this time i know it is so. xD
+Update documentation in progress
 
-## ATENTION
+---
 
-If you read this from the develop branch, I warn you, don't use this files in production environment.
-If you use and ignore my warning, is your responsibility, I don't sure if the version in develop it is working well.
-But if you use this version to test new functionality, I have no problem and you neither xD.
+## Version actual:
 
-### About RC#
+Ultima version liberada: 1.0 Final 04/07/2016 [final][ARG]
 
-RC is initials of Release Candidate, is a previous version of the released version. It is a version almost finished.
+## Documentación:
+
+Actualización de documentación en progreso
